@@ -17,14 +17,6 @@ public class UserSignupService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserEntity signup(LoginRequestDto loginRequestDto) {
-        if (userRepository.findByEmail(loginRequestDto.getEmail()).isPresent()) {
-            throw new RuntimeException("가입된 이메일이 이미 존재합니다.");
-        }
-        UserEntity user = new UserEntity();
-        user.setEmail(loginRequestDto.getEmail());
-        user.setPassword(passwordEncoder.encode(loginRequestDto.getPassword()));
-        return userRepository.save(user);
-    }
+
 
 }
