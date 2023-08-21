@@ -46,42 +46,52 @@ jobs:
           secrets: |
             /secret/smunavi
           parse-json: false   # secret manager
-
-      ## create application-prod.properties
-#      - name: make application.properties
-#        run: |
-#          mkdir -p ./src/main/resources
-#          cd ./src/main/resources
-#          touch ./application.yml
-#          echo "${{ secrets.APP_YML }}" > ./application.yml
-#          touch ./application-API-KEY.yml
-#          echo "${{ secrets.API_KEY_YML }}" > ./application-API-KEY.yml
-#        shell: bash
-
-      - name: Get current time
-        uses: 1466587594/get-current-time@v2  # 빌드 완료 시간 가져오기
-        id: current-time
-        with:
-          format: YYYY-MM-DDTHH-mm-ss
-          utcOffset: "+09:00"
-
-      - name: Generate deployment package
+            
+            # 웹 이미지 빌드 및 도커허브에 push
+      - name: web docker build and push
         run: |
-          mkdir -p deploy
-          cp build/libs/*.jar deploy/application.jar  
-          cp Procfile deploy/Procfile
-          cp -r .ebextensions deploy/.ebextensions
-          cp -r .platform deploy/.platform
-          cd deploy && zip -r deploy.zip . 
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_REPO }}/smu-navi-back .
+          docker push ${{ secrets.DOCKER_REPO }}/smu-navi-back
 
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v21
+
+      # docker compose up
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
         with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}     # github secrets로 등록한 값 사용
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # github secrets로 등록한 값 사용
-          application_name: smu-navi # EB application 이름
-          environment_name: Smu-navi # EB environment 이름
-          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
-          region: ap-northeast-2
-          deployment_package: deploy/deploy.zip
-          wait_for_deployment: false
+          host: ${{ secrets.HOST_PROD }}
+          username: ec2-user
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            sudo docker rm -f $(docker ps -qa)
+            sudo docker pull ${{ secrets.DOCKER_REPO }}/smu-navi-back
+            docker-compose up -d
+            docker image prune -f
+#
+#      - name: Get current time
+#        uses: 1466587594/get-current-time@v2  # 빌드 완료 시간 가져오기
+#        id: current-time
+#        with:
+#          format: YYYY-MM-DDTHH-mm-ss
+#          utcOffset: "+09:00"
+#
+#      - name: Generate deployment package
+#        run: |
+#          mkdir -p deploy
+#          cp build/libs/*.jar deploy/application.jar
+#          cp Procfile deploy/Procfile
+#          cp -r .ebextensions deploy/.ebextensions
+#          cp -r .platform deploy/.platform
+#          cd deploy && zip -r deploy.zip .
+#
+#      - name: Deploy to EB
+#        uses: einaregilsson/beanstalk-deploy@v21
+#        with:
+#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}     # github secrets로 등록한 값 사용
+#          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # github secrets로 등록한 값 사용
+#          application_name: smu-navi # EB application 이름
+#          environment_name: Smu-navi # EB environment 이름
+#          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
+#          region: ap-northeast-2
+#          deployment_package: deploy/deploy.zip
+#          wait_for_deployment: false
