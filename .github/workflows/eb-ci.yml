@@ -47,11 +47,6 @@ jobs:
             /secret/smunavi
           parse-json: false   # secret manager
 
-      - name: Set up AWS credentials
-        run: |
-          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
-          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
 
       # 웹 이미지 빌드 및 도커허브에 push
       - name: web docker build and push
