@@ -1,11 +1,10 @@
 package smu.poodle.smnavi.info.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import smu.poodle.smnavi.exceptiony.DuplicateInfoException;
-import smu.poodle.smnavi.exceptiony.DuplicateNoticeException;
-import smu.poodle.smnavi.exceptiony.InfoNotFoundException;
+import smu.poodle.smnavi.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.errorcode.DetailErrorCode;
+import smu.poodle.smnavi.exception.RestApiException;
 import smu.poodle.smnavi.map.domain.Accident;
 import smu.poodle.smnavi.info.domain.InfoEntity;
 import smu.poodle.smnavi.info.domain.Location;
@@ -40,7 +39,7 @@ public class InfoService {
                 checkDate
         );
         if (noticeCount > 0) {
-            throw new DuplicateNoticeException("1분 이내에 동일한 내용의 제보 글이 등록되었습니다."); //제목이나 내용이 달라야함. id만 다르면 안됨
+            throw new RestApiException(DetailErrorCode.DUPLICATION_ERROR); //제목이나 내용이 달라야함. id만 다르면 안됨
         }
 
         InfoEntity infoEntity = infoDto.ToEntity();
@@ -99,10 +98,10 @@ public class InfoService {
                 updateTime
         );
         if (infoCount > 0) {
-            throw new DuplicateInfoException("수정된 내용이 없습니다.");
+            throw new RestApiException(DetailErrorCode.NOT_MODIFY_ERROR);
         }
         InfoEntity infoEntity = infoRepository.findById(id)
-                .orElseThrow(() -> new InfoNotFoundException("해당 제보 글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
         infoEntity.setTitle(infoDto.getTitle());
         infoEntity.setContent(infoDto.getContent());
         infoRepository.save(infoEntity);
@@ -110,7 +109,7 @@ public class InfoService {
     }
 
     public void increaseViews(Long id) {
-        InfoEntity infoEntity = infoRepository.findById(id).orElseThrow(() -> new InfoNotFoundException("해당 제보 글을 찾을 수 없습니다."));
+        InfoEntity infoEntity = infoRepository.findById(id).orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
         infoEntity.increaseViews();
         infoRepository.save(infoEntity);
     }
@@ -131,7 +130,7 @@ public class InfoService {
     public Long deleteInfoId(Long id) {
         Optional<InfoEntity> infoEntity = infoRepository.findById(id);
         if (!infoEntity.isPresent()) {
-            throw new DuplicateInfoException("삭제할 내용이 없습니다.");
+            throw new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND);
         } else {
             infoRepository.delete(infoEntity.get());
             return infoEntity.get().getId();

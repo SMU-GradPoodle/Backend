@@ -9,8 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import smu.poodle.smnavi.exceptiony.DuplicateNoticeException;
-import smu.poodle.smnavi.exceptiony.ResponseError;
 import smu.poodle.smnavi.info.domain.InfoEntity;
 import smu.poodle.smnavi.info.dto.InfoDto;
 import smu.poodle.smnavi.info.dto.LocationDto;
@@ -25,18 +23,7 @@ public class InfoController {
     private InfoService infoService;
     @PostMapping("/api/info") //글 작성
     public ResponseEntity<Object>addInfo(@RequestBody @Valid InfoDto infoDto, Errors errors){
-        if(errors.hasErrors()){
-            List<ResponseError> responseErrors = new ArrayList<>();
-            errors.getAllErrors().stream().forEach(e->{
-                responseErrors.add(ResponseError.of((FieldError)e));
-            });
-            return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
-        }
-        try{ //동일한 내용이 있을 경우
             infoService.addInfo(infoDto);
-        }catch(DuplicateNoticeException e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
         return ResponseEntity.ok().build();
     }
     @GetMapping("/api/info/{id}") //제보 id별로 조회

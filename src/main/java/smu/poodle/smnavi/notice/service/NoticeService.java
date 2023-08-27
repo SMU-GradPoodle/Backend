@@ -2,9 +2,9 @@ package smu.poodle.smnavi.notice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import smu.poodle.smnavi.exceptiony.DuplicateNoticeException;
-import smu.poodle.smnavi.exceptiony.InfoNotFoundException;
-import smu.poodle.smnavi.exceptiony.NoticeNotFoundException;
+import smu.poodle.smnavi.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.errorcode.DetailErrorCode;
+import smu.poodle.smnavi.exception.RestApiException;
 import smu.poodle.smnavi.notice.domain.NoticeEntity;
 import smu.poodle.smnavi.notice.dto.NoticeDto;
 import smu.poodle.smnavi.notice.repository.NoticeRepository;
@@ -32,7 +32,7 @@ public class NoticeService {
                 checkDate
         );
         if (noticeCount > 0) {
-            throw new DuplicateNoticeException("1분 이내에 동일한 내용의 공지 글이 등록되었습니다."); //제목이나 내용이 달라야함. id만 다르면 안됨
+            throw new RestApiException(DetailErrorCode.DUPLICATION_ERROR); //제목이나 내용이 달라야함. id만 다르면 안됨
         }
         noticeRepository.save(noticeDto.ToEntity());
     }
@@ -44,17 +44,17 @@ public class NoticeService {
                 updateTime
         );
         if(updateCount > 0){
-            throw new DuplicateNoticeException("수정된 내용이 없습니다.");
+            throw new RestApiException(DetailErrorCode.NOT_MODIFY_ERROR);
         }
         NoticeEntity noticeEntity = noticeRepository.findById(id)
-                .orElseThrow(()->new NoticeNotFoundException("해당 공지사항을 찾을 수 없습니다."));
+                .orElseThrow(()->new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
         noticeEntity.setTitle(noticeDto.getTitle());
         noticeEntity.setContent(noticeDto.getContent());
         noticeRepository.save(noticeEntity);
         return Optional.of(noticeEntity);
     }
     public void increaseViews(Long id){
-        NoticeEntity noticeEntity = noticeRepository.findById(id).orElseThrow(()->new InfoNotFoundException("해당 제보 글을 찾을 수 없습니다."));
+        NoticeEntity noticeEntity = noticeRepository.findById(id).orElseThrow(()->new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
         noticeEntity.increaseViews();
         noticeRepository.save(noticeEntity);
     }
@@ -75,7 +75,7 @@ public class NoticeService {
     public Long deleteId(Long id){
         Optional<NoticeEntity> noticeEntity = noticeRepository.findById(id);
         if(!noticeEntity.isPresent()){
-            throw new DuplicateNoticeException("삭제할 내용이 없습니다.");
+            throw new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND);
         }else{
             noticeRepository.delete(noticeEntity.get());
             return noticeEntity.get().getId();
