@@ -1,26 +1,39 @@
 package smu.poodle.smnavi.common;
 
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
+@Setter
+@Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseTimeEntity {
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    LocalDateTime createdAt;
 
-    @LastModifiedDate
-    @Temporal(TemporalType.TIMESTAMP)
-    LocalDateTime updatedAt;
+    ZonedDateTime createdAt;
+    ZonedDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = ZonedDateTime.now();
+        updatedAt = ZonedDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = ZonedDateTime.now();
+    }
+
+    public String getCreatedAtToString() {
+        return createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
 }

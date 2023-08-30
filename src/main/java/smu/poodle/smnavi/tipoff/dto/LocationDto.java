@@ -1,9 +1,9 @@
-package smu.poodle.smnavi.info.dto;
+package smu.poodle.smnavi.tipoff.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import smu.poodle.smnavi.info.domain.Location;
+import smu.poodle.smnavi.tipoff.domain.Location;
 
 import java.util.List;
 

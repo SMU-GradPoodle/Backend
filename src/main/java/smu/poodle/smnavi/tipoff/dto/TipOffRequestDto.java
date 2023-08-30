@@ -1,25 +1,19 @@
-package smu.poodle.smnavi.info.dto;
+package smu.poodle.smnavi.tipoff.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import smu.poodle.smnavi.info.domain.InfoEntity;
+import smu.poodle.smnavi.tipoff.domain.Location;
+import smu.poodle.smnavi.tipoff.domain.TipOff;
 import smu.poodle.smnavi.map.domain.data.TransitType;
-import smu.poodle.smnavi.user.auth.Kind;
-import smu.poodle.smnavi.info.domain.Location;
-
-import java.time.LocalDateTime;
+import smu.poodle.smnavi.tipoff.domain.Kind;
 
 @Getter
 @AllArgsConstructor
 @Builder
-public class InfoDto {
-    private Long id;
-    private LocalDateTime regDate;
-    private LocalDateTime updateDate;
-    private int increaseCount;
+public class TipOffRequestDto {
     private String transitType;
     private int kind;
     private String stationId;
@@ -32,19 +26,16 @@ public class InfoDto {
     @Size(min = 1, max = 5000, message = "내용은 10자 이상 5000자 이하로 입력해주세요.")
     private String content;
 
-    public InfoEntity ToEntity() {
-        return InfoEntity.builder()
-                .id(this.id)
-                .title(this.title)
-                .content(this.content)
-                .regDate(this.regDate)
-                .updateDate(this.updateDate)
+    public TipOff ToEntity() {
+        return TipOff.builder()
+                .title(title)
+                .content(content)
                 .transitType(TransitType.valueOf(transitType))
-                .increaseCount(0)
                 .kind(Kind.getKindByNumber(this.kind))
+                .location(Location.stationIdToLocation(stationId))
+                .increaseCount(0)
                 .build();
     }
-
 }
 
 

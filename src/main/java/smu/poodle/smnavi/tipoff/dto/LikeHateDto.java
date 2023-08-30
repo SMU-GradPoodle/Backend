@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.info.dto;
+package smu.poodle.smnavi.tipoff.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

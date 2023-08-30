@@ -1,16 +1,17 @@
 package smu.poodle.smnavi.map.domain.data;
 
-//todo: Map 을 만들어서 새로운 객체를 생성하지 않도록 관리
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum TransitType {
-    SUBWAY(1), BUS(2), WALK(3);
+    SUBWAY(1,"지하철"),
+    BUS(2, "버스"),
+    WALK(3, "도보");
 
-    private final int typeNumber;
-
-    TransitType(int typeNumber) {
-        this.typeNumber = typeNumber;
-    }
-
-
+    private final int number;
+    private final String description;
 
     public static TransitType of(int typeNumber){
         if(typeNumber == 1){
