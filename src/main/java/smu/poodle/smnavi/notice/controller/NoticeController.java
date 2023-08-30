@@ -4,13 +4,9 @@ package smu.poodle.smnavi.notice.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import smu.poodle.smnavi.exceptiony.DuplicateNoticeException;
-import smu.poodle.smnavi.exceptiony.ResponseError;
 import smu.poodle.smnavi.notice.domain.NoticeEntity;
 import smu.poodle.smnavi.notice.dto.NoticeDto;
 import smu.poodle.smnavi.notice.service.NoticeService;
@@ -24,18 +20,7 @@ public class NoticeController {
     private NoticeService noticeService;
     @PostMapping("/api/notice") //글 작성
     public ResponseEntity<Object>addNotice(@RequestBody @Valid NoticeDto noticeDto, Errors errors){
-        if(errors.hasErrors()) {
-            List<ResponseError> responseErrors = new ArrayList<>();
-            errors.getAllErrors().stream().forEach(e -> {
-                responseErrors.add(ResponseError.of((FieldError)e));
-            });
-            return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
-        }
-        try {
-            noticeService.addNotice(noticeDto);
-        } catch (DuplicateNoticeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        noticeService.addNotice(noticeDto);
         return ResponseEntity.ok().build();
     }
     @GetMapping("/api/notice") //공지사항 글 전체 조회

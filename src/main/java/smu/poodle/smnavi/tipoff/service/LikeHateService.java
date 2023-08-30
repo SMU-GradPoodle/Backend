@@ -1,10 +1,10 @@
-package smu.poodle.smnavi.info.service;
+package smu.poodle.smnavi.tipoff.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import smu.poodle.smnavi.info.domain.LikeHateEntity;
-import smu.poodle.smnavi.info.dto.LikeHateDto;
-import smu.poodle.smnavi.info.repository.LikeHateRepository;
+import smu.poodle.smnavi.tipoff.domain.Thumb;
+import smu.poodle.smnavi.tipoff.dto.LikeHateDto;
+import smu.poodle.smnavi.tipoff.repository.LikeHateRepository;
 import smu.poodle.smnavi.user.sevice.LoginService;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class LikeHateService {
 
     public int checkLikeOrHate(LikeHateDto likeHateDto) {
         Long userId = loginService.getLoginMemberId();
-        Optional<LikeHateEntity> likeOrHate = likeHateRepository.findByUserIdAndBoard_Id(userId, likeHateDto.getBoardId());
+        Optional<Thumb> likeOrHate = likeHateRepository.findByUserAndBoard_Id(userId, likeHateDto.getBoardId());
         //좋아요->좋아요 : 좋아요 취소
         //좋아요->싫어요 : 좋아요 취소 싫어요 증가
         //null->좋아요 : 좋아요 증가
@@ -42,7 +42,7 @@ public class LikeHateService {
         Map<String, Object> result = new HashMap<>();
         int like = likeHateRepository.countByBoard_IdAndIdentify(boardId, 1); //좋아요 개수
         int hate = likeHateRepository.countByBoard_IdAndIdentify(boardId, 0); //싫어요개수
-        Optional<LikeHateEntity> likeOrHate = likeHateRepository.findByUserIdAndBoard_Id(userId, boardId); //눌렀는지 아닌지 여부
+        Optional<Thumb> likeOrHate = likeHateRepository.findByUserAndBoard_Id(userId, boardId); //눌렀는지 아닌지 여부
         result.put("like", like);
         result.put("hate", hate);
 

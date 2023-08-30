@@ -1,8 +1,12 @@
-package smu.poodle.smnavi.user.auth;
+package smu.poodle.smnavi.tipoff.domain;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import smu.poodle.smnavi.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.exception.RestApiException;
 
 @Getter
+@RequiredArgsConstructor
 public enum Kind { //사고 종류
     DEMO(1, "시위"),
     ACCIDENT(2, "사고"),
@@ -10,12 +14,7 @@ public enum Kind { //사고 종류
     BYPASS(4, "우회"),
     CATEGORY_ETC(5, "기타");
     private final int kindNumber;
-    private final String kindExplain;
-
-    Kind(int kindNumber, String kindExplain) {
-        this.kindNumber = kindNumber;
-        this.kindExplain = kindExplain;
-    }
+    private final String kindDescription;
 
     public static Kind getKindByNumber(int number) {
         for (Kind kind : Kind.values()) {
@@ -24,6 +23,6 @@ public enum Kind { //사고 종류
             }
         }
         //todo: CustomException 만들기
-        throw new IllegalArgumentException("Invalid Kind number: " + number);
+        throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
     }
 }
