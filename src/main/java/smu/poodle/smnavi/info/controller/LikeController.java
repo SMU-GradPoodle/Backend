@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import smu.poodle.smnavi.info.dto.LikeHateDto;
 import smu.poodle.smnavi.info.service.LikeHateService;
-import smu.poodle.smnavi.user.auth.CustomUserDetail;
 
 
 @Controller
@@ -21,19 +20,21 @@ import smu.poodle.smnavi.user.auth.CustomUserDetail;
 public class LikeController {
     @Autowired
     private LikeHateService likeHateService;
+
     @PostMapping("/api/info/likehate")
-    public ResponseEntity<?>LikeOrHate(@AuthenticationPrincipal CustomUserDetail user, @RequestBody @Valid LikeHateDto likeHateDto, Errors errors){
-        if(errors.hasErrors()){
+    public ResponseEntity<?> LikeOrHate(@RequestBody @Valid LikeHateDto likeHateDto, Errors errors) {
+        if (errors.hasErrors()) {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
-        int identify = likeHateService.checkLikeOrHate(user.getUser(),likeHateDto.getBoardId(), likeHateDto.getIdentify());
+        int identify = likeHateService.checkLikeOrHate(likeHateDto);
         return ResponseEntity.ok().body(identify);
     }
+
     @GetMapping("/api/info/likehate")
-    public ResponseEntity<?>LikeOrHateEtc(@AuthenticationPrincipal CustomUserDetail user, @RequestBody @Valid LikeHateDto likeHateDto,Errors errors){
-        if(errors.hasErrors()){
+    public ResponseEntity<?> LikeOrHateEtc(@RequestBody @Valid LikeHateDto likeHateDto, Errors errors) {
+        if (errors.hasErrors()) {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok().body(likeHateService.countByBoard_IdAndIdentify(user.getUser(),likeHateDto.getBoardId()));
+        return ResponseEntity.ok().body(likeHateService.countByBoard_IdAndIdentify(likeHateDto.getBoardId()));
     }
 }

@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface LikeHateRepository extends JpaRepository<LikeHateEntity,Integer> { //<엔티티클래스, pk타입>
     LikeHateEntity save(LikeHateEntity likeHateEntity);
-    Optional<LikeHateEntity> findByUserAndBoard_Id(UserEntity user, long boardId);
+    Optional<LikeHateEntity> findByUserIdAndBoard_Id(Long userId, long boardId);
     int countByBoard_IdAndIdentify(Long board_id, int identify);
 }
