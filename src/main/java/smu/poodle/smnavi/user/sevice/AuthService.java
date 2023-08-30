@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,12 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 import smu.poodle.smnavi.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.exception.RestApiException;
 import smu.poodle.smnavi.user.auth.Authority;
-import smu.poodle.smnavi.user.auth.CustomUserDetail;
 import smu.poodle.smnavi.user.domain.JwtRefreshToken;
 import smu.poodle.smnavi.user.domain.UserEntity;
 import smu.poodle.smnavi.user.dto.LoginRequestDto;
 import smu.poodle.smnavi.user.dto.TokenResponseDto;
 import smu.poodle.smnavi.user.jwt.TokenProvider;
+import smu.poodle.smnavi.user.jwt.TokenType;
 import smu.poodle.smnavi.user.repository.JwtRefreshTokenRepository;
 import smu.poodle.smnavi.user.repository.UserRepository;
 
@@ -32,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 @Service
 @RequiredArgsConstructor
 public class AuthService implements UserDetailsService {
+    private final LoginService loginService;
     private final UserRepository userRepository;
     private final JwtRefreshTokenRepository jwtRefreshTokenRepository;
     private final TokenProvider tokenProvider;
@@ -55,7 +57,7 @@ public class AuthService implements UserDetailsService {
     }
 
     @Transactional
-    public TokenResponseDto.AccessToken login(HttpServletResponse response, LoginRequestDto loginRequestDto) {
+    public TokenResponseDto login(HttpServletResponse response, LoginRequestDto loginRequestDto) {
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginRequestDto.getEmail(), loginRequestDto.getPassword()
         );
@@ -63,38 +65,40 @@ public class AuthService implements UserDetailsService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        TokenResponseDto.FullInfo fullTokenInfo = tokenProvider.generateTokenResponse(authentication);
+        TokenResponseDto accessToken = tokenProvider.generateTokenResponse(TokenType.ACCESS_TOKEN, authentication);
 
-        Long memberId = Long.parseLong(authentication.getName());
-        createOrUpdateRefreshToken(memberId, fullTokenInfo);
+        TokenResponseDto refreshToken = tokenProvider.generateTokenResponse(TokenType.REFRESH_TOKEN, authentication);
+        createOrUpdateRefreshToken(refreshToken);
 
-        setRefreshTokenCookie(response, fullTokenInfo.getRefreshToken());
+        setRefreshTokenCookie(response, refreshToken);
 
-        return TokenResponseDto.AccessToken.of(fullTokenInfo);
+        return accessToken;
     }
 
-    private void createOrUpdateRefreshToken(Long userId, TokenResponseDto.FullInfo tokenResponseDto) {
+    private void createOrUpdateRefreshToken(TokenResponseDto refreshTokenDto) {
+        Long userId = loginService.getLoginMemberId();
+
         JwtRefreshToken refreshToken = jwtRefreshTokenRepository.findByUserId(userId)
-                .orElse(JwtRefreshToken.builder().
-                        user(UserEntity.builder().id(userId).build())
+                .orElse(JwtRefreshToken.builder()
+                        .user(UserEntity.builder().id(userId).build())
                         .build());
 
-        refreshToken.updateRefreshToken(tokenResponseDto);
+        refreshToken.updateRefreshToken(refreshTokenDto);
         jwtRefreshTokenRepository.save(refreshToken);
     }
 
-    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+    private void setRefreshTokenCookie(HttpServletResponse response, TokenResponseDto refreshTokenDto) {
 
-        refreshToken = "Bearer " + refreshToken;
-        refreshToken = URLEncoder.encode(refreshToken, StandardCharsets.UTF_8);
+        String cookieValue = "Bearer " + refreshTokenDto.getToken();
+        cookieValue = URLEncoder.encode(cookieValue, StandardCharsets.UTF_8);
 
-        Cookie cookie = new Cookie("REFRESH_TOKEN", refreshToken);
+        Cookie cookie = new Cookie(TokenType.REFRESH_TOKEN.getHeader(), cookieValue);
         cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setDomain("localhost");
-        cookie.setMaxAge(24 * 60 * 60);
+//        cookie.setHttpOnly(true);
+        cookie.setMaxAge((int) refreshTokenDto.getExpiresIn());
         response.addCookie(cookie);
     }
+
 
     @Transactional
     public void logout(HttpServletRequest request) {
@@ -107,23 +111,26 @@ public class AuthService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public TokenResponseDto.AccessToken refreshAccessToken(HttpServletRequest request) {
+    public TokenResponseDto refreshAccessToken(HttpServletRequest request) {
         String refreshToken = tokenProvider.getRefreshToken(request);
-        tokenProvider.validateAccessToken(refreshToken);
+        tokenProvider.validateToken(TokenType.REFRESH_TOKEN, refreshToken);
 
         UserEntity user = userRepository.findByRefreshToken(refreshToken).orElseThrow(() ->
                 new RestApiException(CommonErrorCode.INVALID_TOKEN)
         );
 
-        return tokenProvider.generateTokenResponse(user);
+        return tokenProvider.generateTokenResponse(TokenType.ACCESS_TOKEN, user);
     }
-
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(() ->
                 new RestApiException(CommonErrorCode.INVALID_MAIL_OR_PASSWORD));
 
-        return new CustomUserDetail(user);
+        return User.builder()
+                .username(user.getId().toString())
+                .password(user.getPassword())
+                .authorities(user.getGrantedAuthority())
+                .build();
     }
 }

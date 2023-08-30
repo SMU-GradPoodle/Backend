@@ -20,6 +20,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import smu.poodle.smnavi.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.exception.RestApiException;
+import smu.poodle.smnavi.user.auth.Authority;
 import smu.poodle.smnavi.user.domain.UserEntity;
 import smu.poodle.smnavi.user.dto.TokenResponseDto;
 
@@ -28,19 +29,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Component
 public class TokenProvider {
     private static final String TOKEN_TYPE = "Bearer";
     private static final String AUTHORITY_KEY = "auth";
-    private static final String REFRESH_TOKEN_HEADER = "REFRESH_TOKEN";
-    public static final long JWT_ACCESS_TOKEN_VALIDITY = 2 * 60 * 60 * 1000L;
-    public static final long JWT_REFRESH_TOKEN_VALIDITY = 7 * 24 * 60 * 60 * 1000L;
-    @Value("${jwt.secret-key}")
+    @Value("${JWT_ACCESS_TOKEN_SECRET_KEY}")
     private String accessTokenSecretKey;
 
-    @Value("${jwt.secret-key}")
+    @Value("${JWT_REFRESH_TOKEN_SECRET_KEY}")
     private String refreshTokenSecretKey;
     private Key accessTokenKey;
     private Key refershTokenKey;
@@ -50,53 +48,34 @@ public class TokenProvider {
         accessTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessTokenSecretKey));
         refershTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshTokenSecretKey));
     }
-    public String generateAccessToken(long nowSecond, UserEntity user) {
+
+    private String generateToken(TokenType tokenType, Long userId, String authority, long nowMillisecond) {
         return Jwts.builder()
                 .setIssuer("poodle")
-                .setSubject(user.getId().toString())
-                .claim(AUTHORITY_KEY, user.getAuthority().toString())
-                .setExpiration(new Date(nowSecond + JWT_ACCESS_TOKEN_VALIDITY))
-                .signWith(accessTokenKey, SignatureAlgorithm.HS256)
+                .setSubject(userId.toString())
+                .setExpiration(new Date(nowMillisecond + tokenType.getValidMillisecond()))
+                .claim(AUTHORITY_KEY, authority)
+                .signWith(getKey(tokenType), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateAccessToken(long nowSecond, Authentication authentication) {
-        return Jwts.builder()
-                .setIssuer("poodle")
-                .setSubject(authentication.getName())
-                .claim(AUTHORITY_KEY, authentication.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
-                .setExpiration(new Date(nowSecond + JWT_ACCESS_TOKEN_VALIDITY))
-                .signWith(accessTokenKey, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    public String generateRefreshToken(long nowSecond, Authentication authentication) {
-        return Jwts.builder()
-                .setIssuer("poodle")
-                .setSubject(authentication.getName())
-                .setExpiration(new Date(nowSecond + JWT_REFRESH_TOKEN_VALIDITY))
-                .signWith(refershTokenKey, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    public TokenResponseDto.FullInfo generateTokenResponse(Authentication authentication) {
-        long nowSecond = new Date().getTime();
-        return TokenResponseDto.FullInfo.builder()
-                .accessToken(generateAccessToken(nowSecond, authentication))
-                .expiresIn(nowSecond + JWT_ACCESS_TOKEN_VALIDITY)
-                .refreshToken(generateRefreshToken(nowSecond, authentication))
-                .refreshTokenExpiresIn(nowSecond + JWT_REFRESH_TOKEN_VALIDITY)
+    private TokenResponseDto generateTokenResponse(TokenType tokenType, Long userId, String authority) {
+        long nowMillisecond = new Date().getTime();
+        return TokenResponseDto.builder()
+                .token(generateToken(tokenType, userId, authority, nowMillisecond))
+                .expiresIn((nowMillisecond + tokenType.getValidMillisecond()))
+                .role(Authority.valueOf(authority).getRoleName())
                 .build();
     }
 
-    public TokenResponseDto.AccessToken generateTokenResponse(UserEntity user) {
-        long nowSecond = new Date().getTime();
+    public TokenResponseDto generateTokenResponse(TokenType tokenType, Authentication authentication) {
+        return generateTokenResponse(tokenType,
+                Long.valueOf(authentication.getName()),
+                authentication.getAuthorities().iterator().next().getAuthority());
+    }
 
-        return TokenResponseDto.AccessToken.builder()
-                .accessToken(generateAccessToken(nowSecond, user))
-                .expiresIn(nowSecond + JWT_ACCESS_TOKEN_VALIDITY)
-                .build();
+    public TokenResponseDto generateTokenResponse(TokenType tokenType, UserEntity user) {
+        return generateTokenResponse(tokenType, user.getId(), user.getGrantedAuthority().toString());
     }
 
 
@@ -111,15 +90,12 @@ public class TokenProvider {
         return new UsernamePasswordAuthenticationToken(claims.getSubject(), "", authority);
     }
 
-    public void validateAccessToken(String token) {
-        parseAccessTokenClaims(token);
+    public void validateToken(TokenType tokenType, String token) {
+        parseTokenClaims(tokenType, token);
     }
 
-    public Claims parseAccessTokenClaims(String token) {
-        return parseClaims(token, accessTokenKey);
-    }
-    public Claims parseRefreshTokenClaims(String token) {
-        return parseClaims(token, refershTokenKey);
+    public Claims parseTokenClaims(TokenType tokenType, String token) {
+        return parseClaims(token, getKey(tokenType));
     }
 
     private Claims parseClaims(String token, Key key) {
@@ -134,7 +110,8 @@ public class TokenProvider {
 
     public String getAccessToken(HttpServletRequest request) {
         String token = Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION)).orElseThrow(() ->
-                new RestApiException(CommonErrorCode.LOGIN_REQUIRED));
+                new RestApiException(CommonErrorCode.LOGIN_REQUIRED)
+        );
 
         if (!StringUtils.hasText(token) || !StringUtils.startsWithIgnoreCase(token, TOKEN_TYPE)) {
             throw new RestApiException(CommonErrorCode.INVALID_TOKEN);
@@ -144,7 +121,7 @@ public class TokenProvider {
     }
 
     public String getRefreshToken(HttpServletRequest request) {
-        String token = getCookieByName(request, REFRESH_TOKEN_HEADER).orElseThrow(() ->
+        String token = getCookieByName(request, TokenType.REFRESH_TOKEN.getHeader()).orElseThrow(() ->
                 new RestApiException(CommonErrorCode.REFRESH_TOKEN_NOT_EXIST)
         );
 
@@ -165,5 +142,14 @@ public class TokenProvider {
             }
         }
         return Optional.empty();
+    }
+
+    private Key getKey(TokenType tokenType) {
+        if (tokenType == TokenType.ACCESS_TOKEN) {
+            return accessTokenKey;
+        } else if (tokenType == TokenType.REFRESH_TOKEN) {
+            return refershTokenKey;
+        }
+        return null;
     }
 }

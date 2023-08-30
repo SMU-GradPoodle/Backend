@@ -21,8 +21,9 @@ public class JwtRefreshToken {
     UserEntity user;
     String refreshToken;
     long expiredTime;
-    public void updateRefreshToken(TokenResponseDto.FullInfo tokenResponseDto) {
-        refreshToken = tokenResponseDto.getRefreshToken();
-        expiredTime = tokenResponseDto.getRefreshTokenExpiresIn();
+
+    public void updateRefreshToken(TokenResponseDto tokenResponseDto) {
+        refreshToken = tokenResponseDto.getToken();
+        expiredTime = tokenResponseDto.getExpiresIn();
     }
 }

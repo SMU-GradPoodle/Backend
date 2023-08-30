@@ -17,27 +17,27 @@ import smu.poodle.smnavi.user.sevice.AuthService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/members")
+@RequestMapping("/api")
 public class AuthController {
     private final AuthService authService;
 
-    @PostMapping("/api/user/signup")
+    @PostMapping("/user/signup")
     public UserEntity signup(@RequestBody LoginRequestDto loginRequestDto){
         return authService.signup(loginRequestDto);
     }
 
 
-    @PostMapping("/login")
-    public ResponseEntity<TokenResponseDto.AccessToken> login(HttpServletResponse response, @RequestBody LoginRequestDto loginRequestDto) {
+    @PostMapping("/user/login")
+    public ResponseEntity<TokenResponseDto> login(HttpServletResponse response, @RequestBody LoginRequestDto loginRequestDto) {
         return ResponseEntity.ok(authService.login(response, loginRequestDto));
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<TokenResponseDto.AccessToken> refreshAccessToken(HttpServletRequest request) {
+    @PostMapping("/user/refresh")
+    public ResponseEntity<TokenResponseDto> refreshAccessToken(HttpServletRequest request) {
         return ResponseEntity.ok(authService.refreshAccessToken(request));
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/user/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         authService.logout(request);
         return ResponseEntity.ok().build();
