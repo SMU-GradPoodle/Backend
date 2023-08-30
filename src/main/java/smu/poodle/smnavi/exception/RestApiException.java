@@ -6,6 +6,6 @@ import smu.poodle.smnavi.errorcode.ErrorCode;
 
 @Getter
 @RequiredArgsConstructor
-public class RestApiException extends RuntimeException{
+public class RestApiException extends RuntimeException {
     private final ErrorCode errorCode;
 }
