@@ -1,11 +1,11 @@
-package smu.poodle.smnavi.info.service;
+package smu.poodle.smnavi.tipoff.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import smu.poodle.smnavi.info.domain.InfoEntity;
-import smu.poodle.smnavi.info.domain.LikeHateEntity;
-import smu.poodle.smnavi.info.repository.InfoRepository;
-import smu.poodle.smnavi.info.repository.LikeHateRepository;
+import smu.poodle.smnavi.tipoff.domain.Thumb;
+import smu.poodle.smnavi.tipoff.domain.TipOff;
+import smu.poodle.smnavi.tipoff.repository.TipOffRepository;
+import smu.poodle.smnavi.tipoff.repository.LikeHateRepository;
 import smu.poodle.smnavi.user.domain.UserEntity;
 
 import java.util.HashMap;
@@ -16,10 +16,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LikeHateService {
     private final LikeHateRepository likeHateRepository;
-    private final InfoRepository infoRepository;
+    private final TipOffRepository tipOffRepository;
 
     public int checkLikeOrHate(UserEntity user, long boardId, int identify) {
-        Optional<LikeHateEntity> likeOrHate = likeHateRepository.findByUserAndBoard_Id(user, boardId);
+        Optional<Thumb> likeOrHate = likeHateRepository.findByUserAndBoard_Id(user, boardId);
         //좋아요->좋아요 : 좋아요 취소
         //좋아요->싫어요 : 좋아요 취소 싫어요 증가
         //null->좋아요 : 좋아요 증가
@@ -36,13 +36,13 @@ public class LikeHateService {
                 return likeOrHate.get().getIdentify();
             }
         } else { //누른 전적이 없음
-            Optional<InfoEntity> board = infoRepository.findById(boardId);
-            LikeHateEntity likeHateEntity = new LikeHateEntity();
-            likeHateEntity.setUser(user);
-            likeHateEntity.setBoard(board.get());
-            likeHateEntity.setIdentify(identify);
-            likeHateRepository.save(likeHateEntity);
-            return likeHateEntity.getIdentify();
+            Optional<TipOff> board = tipOffRepository.findById(boardId);
+            Thumb thumb = new Thumb();
+            thumb.setUser(user);
+            thumb.setTipOff(board.get());
+            thumb.setIdentify(identify);
+            likeHateRepository.save(thumb);
+            return thumb.getIdentify();
         }
         return -1; //-1은 그냥 없는거야! 0은 싫어요, 1은 좋아요야.
     }
@@ -51,7 +51,7 @@ public class LikeHateService {
         Map<String, Object> result = new HashMap<>();
         int like = likeHateRepository.countByBoard_IdAndIdentify(boardId, 1); //좋아요 개수
         int hate = likeHateRepository.countByBoard_IdAndIdentify(boardId, 0); //싫어요개수
-        Optional<LikeHateEntity> likeOrHate = likeHateRepository.findByUserAndBoard_Id(user, boardId); //눌렀는지 아닌지 여부
+        Optional<Thumb> likeOrHate = likeHateRepository.findByUserAndBoard_Id(user, boardId); //눌렀는지 아닌지 여부
         result.put("like", like);
         result.put("hate", hate);
 
