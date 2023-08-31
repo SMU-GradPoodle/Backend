@@ -15,11 +15,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import smu.poodle.smnavi.common.service.RedisService;
 import smu.poodle.smnavi.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.errorcode.DetailErrorCode;
 import smu.poodle.smnavi.exception.RestApiException;
-import smu.poodle.smnavi.user.auth.Authority;
 import smu.poodle.smnavi.user.domain.JwtRefreshToken;
 import smu.poodle.smnavi.user.domain.UserEntity;
 import smu.poodle.smnavi.user.dto.AuthRequestDto;
@@ -33,7 +31,6 @@ import smu.poodle.smnavi.user.repository.UserRepository;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

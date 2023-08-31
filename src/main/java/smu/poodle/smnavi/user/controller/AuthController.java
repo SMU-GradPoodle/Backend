@@ -23,7 +23,7 @@ import smu.poodle.smnavi.user.sevice.AuthService;
 public class AuthController {
     private final AuthService authService;
 
-    @PostMapping("/user/chek-duplicate-nickname")
+    @PostMapping("/user/check-duplicate-nickname")
     public BaseResponse<Void> checkDuplicateNickname(@RequestBody @Valid AuthRequestDto.Nickname authRequestDto) {
         authService.checkDuplicateNickname(authRequestDto);
 
