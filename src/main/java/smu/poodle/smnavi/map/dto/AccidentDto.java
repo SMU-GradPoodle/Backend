@@ -17,12 +17,14 @@ public class AccidentDto {
         Long id;
         String kind;
         AbstractWaypointDto station;
+        String createdAt;
 
         public static AccidentDto.Info of(Accident accident) {
             return Info.builder()
                     .id(accident.getId())
                     .kind(accident.getMessage())
                     .station(accident.getWaypoint().toDto())
+                    .createdAt(accident.getCreatedTimeToString())
                     .build();
         }
     }

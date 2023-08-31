@@ -1,15 +1,10 @@
 package smu.poodle.smnavi.common.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -33,7 +28,11 @@ public abstract class BaseTimeEntity {
         updatedAt = ZonedDateTime.now();
     }
 
-    public String getCreatedAtToString() {
+    public String getCreatedDateToString() {
         return createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    public String getCreatedTimeToString() {
+        return createdAt.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 }

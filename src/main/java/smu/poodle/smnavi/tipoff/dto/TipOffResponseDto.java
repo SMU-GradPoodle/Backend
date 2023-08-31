@@ -1,14 +1,9 @@
 package smu.poodle.smnavi.tipoff.dto;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import smu.poodle.smnavi.map.domain.data.TransitType;
-import smu.poodle.smnavi.tipoff.domain.Kind;
 import smu.poodle.smnavi.tipoff.domain.Location;
 import smu.poodle.smnavi.tipoff.domain.TipOff;
 
@@ -34,7 +29,7 @@ public class TipOffResponseDto {
                     .content(tipOff.getContent())
                     .transportation(Transportation.of(tipOff.getLocation()))
                     .kind(Kind.of(tipOff.getKind()))
-                    .createdAt(tipOff.getCreatedAtToString())
+                    .createdAt(tipOff.getCreatedDateToString())
                     .build();
         }
     }
