@@ -10,6 +10,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TokenResponseDto {
     String token;
-    long expiresIn;
+    long expiresAt;
     String role;
 }

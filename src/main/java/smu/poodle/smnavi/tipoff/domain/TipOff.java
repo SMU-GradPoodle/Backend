@@ -3,13 +3,9 @@ package smu.poodle.smnavi.tipoff.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import smu.poodle.smnavi.common.BaseTimeEntity;
+import smu.poodle.smnavi.common.domain.BaseTimeEntity;
 import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter

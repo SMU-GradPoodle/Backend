@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.common;
+package smu.poodle.smnavi.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import smu.poodle.smnavi.errorcode.ErrorCode;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)

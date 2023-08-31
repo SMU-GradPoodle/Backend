@@ -3,7 +3,7 @@ package smu.poodle.smnavi.map.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import smu.poodle.smnavi.common.BaseTimeEntity;
+import smu.poodle.smnavi.common.domain.BaseTimeEntity;
 
 @Entity
 @Getter

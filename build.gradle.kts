@@ -26,28 +26,34 @@ tasks.getByName<Jar>("jar") {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.json:json:20220924")
     implementation("org.springframework.boot:spring-boot-starter-batch")
-    implementation("junit:junit:4.13.1")
+
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
 
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.1")
     implementation("org.springframework.cloud:spring-cloud-starter-aws-secrets-manager-config:2.2.6.RELEASE")
 
-//	implementation ("com.querydsl:querydsl-jpa")
-//	implementation ("com.querydsl:querydsl-apt")
-    compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    runtimeOnly("com.mysql:mysql-connector-j")
-    annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.batch:spring-batch-test")
+
+    runtimeOnly("com.mysql:mysql-connector-j")
+
+    implementation("junit:junit:4.13.2")
+    implementation("org.json:json:20230227")
+
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
 
     implementation ("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly ("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly ("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
+//	implementation ("com.querydsl:querydsl-jpa")
+//	implementation ("com.querydsl:querydsl-apt")
 }
 
 tasks.withType<Test> {

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import smu.poodle.smnavi.common.PageResult;
+import smu.poodle.smnavi.common.dto.PageResult;
 import smu.poodle.smnavi.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.errorcode.DetailErrorCode;
 import smu.poodle.smnavi.exception.RestApiException;
