@@ -1,8 +1,8 @@
-package smu.poodle.smnavi.exception;
+package smu.poodle.smnavi.common.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import smu.poodle.smnavi.errorcode.ErrorCode;
+import smu.poodle.smnavi.common.errorcode.ErrorCode;
 
 @Getter
 @RequiredArgsConstructor

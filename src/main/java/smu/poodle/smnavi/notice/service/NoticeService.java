@@ -2,9 +2,9 @@ package smu.poodle.smnavi.notice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import smu.poodle.smnavi.errorcode.CommonErrorCode;
-import smu.poodle.smnavi.errorcode.DetailErrorCode;
-import smu.poodle.smnavi.exception.RestApiException;
+import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
+import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.notice.domain.NoticeEntity;
 import smu.poodle.smnavi.notice.dto.NoticeDto;
 import smu.poodle.smnavi.notice.repository.NoticeRepository;

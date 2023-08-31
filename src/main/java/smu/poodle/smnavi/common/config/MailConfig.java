@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.config;
+package smu.poodle.smnavi.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

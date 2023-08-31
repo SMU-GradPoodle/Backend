@@ -5,8 +5,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import smu.poodle.smnavi.errorcode.CommonErrorCode;
-import smu.poodle.smnavi.exception.RestApiException;
+import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.common.exception.RestApiException;
 
 
 @Component

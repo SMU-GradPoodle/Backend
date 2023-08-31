@@ -4,9 +4,9 @@ import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import smu.poodle.smnavi.errorcode.CommonErrorCode;
-import smu.poodle.smnavi.errorcode.ErrorCode;
-import smu.poodle.smnavi.exception.RestApiException;
+import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.common.errorcode.ErrorCode;
+import smu.poodle.smnavi.common.exception.RestApiException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

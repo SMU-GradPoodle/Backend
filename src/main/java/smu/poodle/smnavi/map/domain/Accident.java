@@ -11,7 +11,8 @@ import smu.poodle.smnavi.tipoff.domain.Kind;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Where(clause = "created_at > date_sub(now(), interval 1 hour)")
+//todo : 배포 전에 풀어야함
+//@Where(clause = "created_at > date_sub(now(), interval 1 hour)")
 @Getter
 public class Accident extends BaseTimeEntity {
     @Id

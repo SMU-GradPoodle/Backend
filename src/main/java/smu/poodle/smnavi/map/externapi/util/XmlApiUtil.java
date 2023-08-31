@@ -1,11 +1,10 @@
 package smu.poodle.smnavi.map.externapi.util;
 
-import lombok.experimental.UtilityClass;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-import smu.poodle.smnavi.errorcode.CommonErrorCode;
-import smu.poodle.smnavi.exception.RestApiException;
+import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.common.exception.RestApiException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

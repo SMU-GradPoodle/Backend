@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import smu.poodle.smnavi.map.domain.path.DetailPosition;
 import smu.poodle.smnavi.map.domain.path.Edge;
-import smu.poodle.smnavi.errorcode.ExternApiErrorCode;
+import smu.poodle.smnavi.common.errorcode.ExternApiErrorCode;
 import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.externapi.ApiConstantValue;
 import smu.poodle.smnavi.map.externapi.ApiKeyValue;

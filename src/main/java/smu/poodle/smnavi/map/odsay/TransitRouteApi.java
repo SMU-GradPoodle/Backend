@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
-import smu.poodle.smnavi.errorcode.ExternApiErrorCode;
+import smu.poodle.smnavi.common.errorcode.ExternApiErrorCode;
 import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.dto.BusStationDto;
 import smu.poodle.smnavi.map.dto.PathDto;

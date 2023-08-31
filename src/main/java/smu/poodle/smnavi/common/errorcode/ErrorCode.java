@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.errorcode;
+package smu.poodle.smnavi.common.errorcode;
 
 import org.springframework.http.HttpStatus;
 

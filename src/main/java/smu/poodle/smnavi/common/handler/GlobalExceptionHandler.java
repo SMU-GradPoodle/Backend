@@ -1,12 +1,12 @@
-package smu.poodle.smnavi.handler;
+package smu.poodle.smnavi.common.handler;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import smu.poodle.smnavi.errorcode.ErrorCode;
-import smu.poodle.smnavi.exception.RestApiException;
+import smu.poodle.smnavi.common.errorcode.ErrorCode;
+import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.map.response.ErrorResponse;
 
 import java.util.List;

@@ -25,7 +25,7 @@ public class AccidentService {
         //레파지토리에서 모든 사고 정보를 꺼내옴
         //DTO로 변환을 해줨
         //반환
-        return accidentRepository.findAll().stream().map(AccidentDto.Info::of).toList();
+        return accidentRepository.findTopThree().stream().map(AccidentDto.Info::of).toList();
     }
 
     @Scheduled(cron = "0 0/10 7-17 * * *")

@@ -2,8 +2,8 @@ package smu.poodle.smnavi.tipoff.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import smu.poodle.smnavi.errorcode.CommonErrorCode;
-import smu.poodle.smnavi.exception.RestApiException;
+import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.common.exception.RestApiException;
 
 @Getter
 @RequiredArgsConstructor
