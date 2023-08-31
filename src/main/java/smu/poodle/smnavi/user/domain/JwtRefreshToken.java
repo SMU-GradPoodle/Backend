@@ -24,6 +24,6 @@ public class JwtRefreshToken {
 
     public void updateRefreshToken(TokenResponseDto tokenResponseDto) {
         refreshToken = tokenResponseDto.getToken();
-        expiredTime = tokenResponseDto.getExpiresIn();
+        expiredTime = tokenResponseDto.getExpiresAt();
     }
 }

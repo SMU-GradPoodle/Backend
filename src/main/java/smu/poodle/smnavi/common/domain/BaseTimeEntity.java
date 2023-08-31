@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.common;
+package smu.poodle.smnavi.common.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

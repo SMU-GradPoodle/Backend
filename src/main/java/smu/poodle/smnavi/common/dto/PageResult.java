@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.common;
+package smu.poodle.smnavi.common.dto;
 
 
 import lombok.Getter;

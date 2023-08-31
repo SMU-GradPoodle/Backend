@@ -47,12 +47,6 @@ public class SecurityConfig {
 
                 .formLogin(AbstractHttpConfigurer::disable)
 
-                .logout((configurer) ->
-                        configurer
-                                .logoutUrl("/api/users/logout")
-                                .deleteCookies("JSESSIONID")
-                )
-
                 //인증되지 않은 자원에 접근했을 때
                 .exceptionHandling((configurer) ->
                         configurer

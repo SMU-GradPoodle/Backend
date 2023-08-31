@@ -3,7 +3,7 @@ package smu.poodle.smnavi.map.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Where;
-import smu.poodle.smnavi.common.BaseTimeEntity;
+import smu.poodle.smnavi.common.domain.BaseTimeEntity;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.tipoff.domain.Kind;
 

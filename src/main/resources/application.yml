@@ -15,6 +15,23 @@ spring:
     hibernate:
       ddl-auto: update
 
+  data:
+    redis:
+      port: 6379
+
+  mail:
+    properties:
+      debug: 'true'
+      mail:
+        smtp:
+          starttls:
+            enable: 'true'
+          auth: 'true'
+    host: smtp.gmail.com
+    username: ${GMAIL_EMAIL}
+    password: ${GMAIL_PASSWORD}
+    port: 587
+
 server:
   port: 8080
   error:
