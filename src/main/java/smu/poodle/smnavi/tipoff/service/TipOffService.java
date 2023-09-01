@@ -19,6 +19,7 @@ import smu.poodle.smnavi.tipoff.domain.TipOff;
 import smu.poodle.smnavi.tipoff.dto.LocationDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffRequestDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffResponseDto;
+import smu.poodle.smnavi.tipoff.repository.LikeHateRepository;
 import smu.poodle.smnavi.tipoff.repository.TipOffRepository;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,8 @@ public class TipOffService {
     private final BusStationRepository busStationRepository;
     private final SubwayStationRepository subwayStationRepository;
     private final AccidentRepository accidentRepository;
+
+    private final LikeHateRepository likeHateRepository;
 
 
     public void addInfo(TipOffRequestDto tipOffRequestDto) {

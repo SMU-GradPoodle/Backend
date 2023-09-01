@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import smu.poodle.smnavi.tipoff.domain.Location;
+import smu.poodle.smnavi.tipoff.domain.ThumbStatus;
 import smu.poodle.smnavi.tipoff.domain.TipOff;
 
 
@@ -20,9 +21,10 @@ public class TipOffResponseDto {
         String title;
         String content;
         String createdAt;
+        LikeHateStatusDto likeHateStatusDto;
 
 
-        public static Detail of(TipOff tipOff) {
+        public static Detail of(TipOff tipOff, LikeHateStatusDto likeHateStatusDto) {
             return Detail.builder()
                     .id(tipOff.getId())
                     .title(tipOff.getTitle())
@@ -30,6 +32,7 @@ public class TipOffResponseDto {
                     .transportation(Transportation.of(tipOff.getLocation()))
                     .kind(Kind.of(tipOff.getKind()))
                     .createdAt(tipOff.getCreatedDateToString())
+                    .likeHateStatusDto(likeHateStatusDto)
                     .build();
         }
     }
