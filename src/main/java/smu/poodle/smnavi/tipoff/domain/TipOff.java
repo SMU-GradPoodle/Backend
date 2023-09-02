@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import smu.poodle.smnavi.common.domain.BaseTimeEntity;
 import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
+import smu.poodle.smnavi.user.domain.UserEntity;
 
 @Entity
 @Getter
@@ -21,6 +22,10 @@ public class TipOff extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String title;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    UserEntity author;
 
     String content;
 

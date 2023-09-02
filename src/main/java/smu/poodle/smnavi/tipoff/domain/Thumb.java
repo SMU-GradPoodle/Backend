@@ -28,7 +28,6 @@ public class Thumb {
     @NotNull
     TipOff tipOff;
 
-    Integer identify; //버튼 누름 여부
-
+    @Enumerated(EnumType.STRING)
     ThumbStatus thumbStatus;
 }

@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import smu.poodle.smnavi.tipoff.domain.Location;
-import smu.poodle.smnavi.tipoff.domain.ThumbStatus;
 import smu.poodle.smnavi.tipoff.domain.TipOff;
 
 
@@ -16,23 +15,26 @@ public class TipOffResponseDto {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Detail {
         Long id;
+        String nickname;
         Kind kind;
         Transportation transportation;
         String title;
         String content;
-        String createdAt;
-        LikeHateStatusDto likeHateStatusDto;
+        String createdDate;
+        String createdTime;
+        LikeInfoDto likeInfoDto;
 
-
-        public static Detail of(TipOff tipOff, LikeHateStatusDto likeHateStatusDto) {
+        public static Detail of(TipOff tipOff, LikeInfoDto likeInfoDto) {
             return Detail.builder()
                     .id(tipOff.getId())
+                    .nickname(tipOff.getAuthor() == null ? "익명이" : tipOff.getAuthor().getNickname())
                     .title(tipOff.getTitle())
                     .content(tipOff.getContent())
                     .transportation(Transportation.of(tipOff.getLocation()))
                     .kind(Kind.of(tipOff.getKind()))
-                    .createdAt(tipOff.getCreatedDateToString())
-                    .likeHateStatusDto(likeHateStatusDto)
+                    .createdDate(tipOff.getCreatedDateToString())
+                    .createdTime(tipOff.getCreatedTimeToString())
+                    .likeInfoDto(likeInfoDto)
                     .build();
         }
     }

@@ -8,6 +8,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LoginService {
     public Long getLoginMemberId() {
-        return Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+        try {
+            return Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+        }
+        catch (NumberFormatException e) {
+            return 0L;
+        }
     }
 }
