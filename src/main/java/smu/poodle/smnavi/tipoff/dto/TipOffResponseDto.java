@@ -22,7 +22,7 @@ public class TipOffResponseDto {
         String content;
         String createdDate;
         String createdTime;
-        LikeInfoDto likeInfoDto;
+        LikeInfoDto likeInfo;
 
         public static Detail of(TipOff tipOff, LikeInfoDto likeInfoDto) {
             return Detail.builder()
@@ -34,7 +34,7 @@ public class TipOffResponseDto {
                     .kind(Kind.of(tipOff.getKind()))
                     .createdDate(tipOff.getCreatedDateToString())
                     .createdTime(tipOff.getCreatedTimeToString())
-                    .likeInfoDto(likeInfoDto)
+                    .likeInfo(likeInfoDto)
                     .build();
         }
     }
