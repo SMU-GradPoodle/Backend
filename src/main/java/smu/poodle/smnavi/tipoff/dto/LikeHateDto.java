@@ -8,9 +8,10 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class LikeHateDto {
-    private int id;
+    private long id;
     private long boardId;
     private int identify;
+
 
     public LikeHateDto(){}
     public LikeHateDto(long board, int identify){

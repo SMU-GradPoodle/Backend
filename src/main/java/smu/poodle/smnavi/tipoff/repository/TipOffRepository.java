@@ -25,7 +25,8 @@ public interface TipOffRepository extends JpaRepository<TipOff, Long> {
     @Query("select t from TipOff as t " +
             "where :query is null or " +
             "t.title ilike concat('%', :query, '%') " +
-            "or t.content ilike concat('%', :query, '%')")
+            "or t.content ilike concat('%', :query, '%') " +
+            "order by t.createdAt desc ")
     Page<TipOff> findByQuery(@Param("query") String query, Pageable pageable);
 
 //    int countByTitleAndContentAndRegDateIsGreaterThanEqual(String title, String content, LocalDateTime regDate);

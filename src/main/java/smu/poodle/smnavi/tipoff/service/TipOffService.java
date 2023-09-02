@@ -20,6 +20,7 @@ import smu.poodle.smnavi.tipoff.dto.LocationDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffRequestDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffResponseDto;
 import smu.poodle.smnavi.tipoff.repository.TipOffRepository;
+import smu.poodle.smnavi.user.sevice.LoginService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,15 +30,17 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TipOffService {
+    private final LoginService loginService;
     private final TipOffRepository tipOffRepository;
     private final BusStationRepository busStationRepository;
     private final SubwayStationRepository subwayStationRepository;
     private final AccidentRepository accidentRepository;
+    private final ThumbService thumbService;
 
 
     public void addInfo(TipOffRequestDto tipOffRequestDto) {
 
-        TipOff tipOff = tipOffRequestDto.ToEntity();
+        TipOff tipOff = tipOffRequestDto.ToEntity(loginService.getLoginMemberId());
 
         if (tipOff.getTransitType() == TransitType.BUS) {
             Waypoint waypoint = busStationRepository.findAllByLocalStationId(tipOffRequestDto.getStationId()).get(0);
@@ -65,7 +68,10 @@ public class TipOffService {
     public PageResult<TipOffResponseDto.Detail> getTipOffList(String keyword, Pageable pageable) {
         Page<TipOff> tipOffPage = tipOffRepository.findByQuery(keyword, pageable);
 
-        return PageResult.of(tipOffPage.map(TipOffResponseDto.Detail::of));
+        return PageResult.of(tipOffPage.map((tipOff -> {
+            return TipOffResponseDto.Detail.of(tipOff,
+                    thumbService.getLikeInfo(tipOff.getId()));
+        })));
     }
 
     public Optional<TipOff> updateInfo(Long id, TipOffRequestDto tipOffRequestDto) {

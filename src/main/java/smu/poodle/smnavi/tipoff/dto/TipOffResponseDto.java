@@ -15,21 +15,26 @@ public class TipOffResponseDto {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Detail {
         Long id;
+        String nickname;
         Kind kind;
         Transportation transportation;
         String title;
         String content;
-        String createdAt;
+        String createdDate;
+        String createdTime;
+        LikeInfoDto likeInfo;
 
-
-        public static Detail of(TipOff tipOff) {
+        public static Detail of(TipOff tipOff, LikeInfoDto likeInfoDto) {
             return Detail.builder()
                     .id(tipOff.getId())
+                    .nickname(tipOff.getAuthor() == null ? "익명이" : tipOff.getAuthor().getNickname())
                     .title(tipOff.getTitle())
                     .content(tipOff.getContent())
                     .transportation(Transportation.of(tipOff.getLocation()))
                     .kind(Kind.of(tipOff.getKind()))
-                    .createdAt(tipOff.getCreatedDateToString())
+                    .createdDate(tipOff.getCreatedDateToString())
+                    .createdTime(tipOff.getCreatedTimeToString())
+                    .likeInfo(likeInfoDto)
                     .build();
         }
     }
