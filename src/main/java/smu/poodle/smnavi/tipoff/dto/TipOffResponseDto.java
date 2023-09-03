@@ -28,7 +28,6 @@ public class TipOffResponseDto {
             return Detail.builder()
                     .id(tipOff.getId())
                     .nickname(tipOff.getAuthor() == null ? "익명이" : tipOff.getAuthor().getNickname())
-                    .title(tipOff.getTitle())
                     .content(tipOff.getContent())
                     .transportation(Transportation.of(tipOff.getLocation()))
                     .kind(Kind.of(tipOff.getKind()))

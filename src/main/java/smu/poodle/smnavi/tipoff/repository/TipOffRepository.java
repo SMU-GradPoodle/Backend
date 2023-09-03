@@ -14,20 +14,9 @@ import java.util.Optional;
 
 @Repository
 public interface TipOffRepository extends JpaRepository<TipOff, Long> {
-    //공지사항 등록
-    TipOff save(TipOff tipOff);
-
-    //공지사항 조회
-    Optional<TipOff> findById(Long id);
-
-    List<TipOff> findAll();
-
     @Query("select t from TipOff as t " +
-            "where :query is null or " +
-            "t.title ilike concat('%', :query, '%') " +
+            "where :query is null " +
             "or t.content ilike concat('%', :query, '%') " +
             "order by t.createdAt desc ")
     Page<TipOff> findByQuery(@Param("query") String query, Pageable pageable);
-
-//    int countByTitleAndContentAndRegDateIsGreaterThanEqual(String title, String content, LocalDateTime regDate);
 }

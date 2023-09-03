@@ -82,7 +82,6 @@ public class TipOffService {
         }
         TipOff tipOff = tipOffRepository.findById(id)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
-        tipOff.setTitle(tipOffRequestDto.getTitle());
         tipOff.setContent(tipOffRequestDto.getContent());
         tipOffRepository.save(tipOff);
         return Optional.of(tipOff);
@@ -98,7 +97,6 @@ public class TipOffService {
     public Optional<TipOffRequestDto> getInfoById(Long id) {
         Optional<TipOff> infoEntity = tipOffRepository.findById(id);
         Optional<TipOffRequestDto> infoDto = Optional.ofNullable(TipOffRequestDto.builder()
-                .title(infoEntity.get().getTitle())
                 .content(infoEntity.get().getContent())
                 .build());
         return infoDto;
