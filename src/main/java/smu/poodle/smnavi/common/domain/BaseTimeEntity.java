@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -19,13 +21,19 @@ public abstract class BaseTimeEntity {
 
     @PrePersist
     public void prePersist() {
-        createdAt = ZonedDateTime.now();
-        updatedAt = ZonedDateTime.now();
+        ZonedDateTime now = getCurrentSeoulTime();
+        createdAt = now;
+        updatedAt = now;
     }
 
     @PreUpdate
     public void preUpdate() {
-        updatedAt = ZonedDateTime.now();
+        updatedAt = getCurrentSeoulTime();
+    }
+
+
+    private ZonedDateTime getCurrentSeoulTime() {
+        return ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 
     public String getCreatedDateToString() {
@@ -34,5 +42,24 @@ public abstract class BaseTimeEntity {
 
     public String getCreatedTimeToString() {
         return createdAt.format(DateTimeFormatter.ofPattern("HH:mm"));
+    }
+
+    public String getFormattedCreatedAt() {
+        ZonedDateTime now = getCurrentSeoulTime();
+        Duration duration = Duration.between(createdAt, now);
+
+        if (duration.toMinutes() < 60) {
+            long minutes = duration.toMinutes();
+            return minutes + "분 전";
+        } else if (duration.toHours() < 24) {
+            long hours = duration.toHours();
+            return hours + "시간 전";
+        } else if (duration.toDays() < 5) {
+            long days = duration.toDays();
+            return days + "일 전";
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
+            return createdAt.format(formatter);
+        }
     }
 }
