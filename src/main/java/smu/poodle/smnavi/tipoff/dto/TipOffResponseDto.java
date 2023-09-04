@@ -18,9 +18,7 @@ public class TipOffResponseDto {
         String nickname;
         Kind kind;
         Transportation transportation;
-        String title;
         String content;
-        String createdDate;
         String createdTime;
         LikeInfoDto likeInfo;
 
@@ -31,8 +29,7 @@ public class TipOffResponseDto {
                     .content(tipOff.getContent())
                     .transportation(Transportation.of(tipOff.getLocation()))
                     .kind(Kind.of(tipOff.getKind()))
-                    .createdDate(tipOff.getCreatedDateToString())
-                    .createdTime(tipOff.getCreatedTimeToString())
+                    .createdTime(tipOff.getFormattedCreatedAt())
                     .likeInfo(likeInfoDto)
                     .build();
         }
