@@ -1,6 +1,7 @@
 package smu.poodle.smnavi.map.externapi.busarrinfo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -23,6 +24,7 @@ import java.util.regex.Pattern;
  * API REF 페이지
  * https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15000314
  */
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class BusArriveInfoApi {
@@ -65,6 +67,15 @@ public class BusArriveInfoApi {
 
                 String firstArrivalNextStationId = itemElement.getElementsByTagName("nstnId1").item(0).getTextContent();
                 String secondArrivalNextStationId = itemElement.getElementsByTagName("nstnId2").item(0).getTextContent();
+
+                log.info("첫 번째 도착 메시지: {}", firstArrivalMessage);
+                log.info("두 번째 도착 메시지: {}", secondArrivalMessage);
+
+                log.info("첫 번째 도착 차량 번호판: {}", firstArrivalLicensePlate);
+                log.info("두 번째 도착 차량 번호판: {}", secondArrivalLicensePlate);
+
+                log.info("첫 번째 도착 다음 정류장 ID: {}", firstArrivalNextStationId);
+                log.info("두 번째 도착 다음 정류장 ID: {}", secondArrivalNextStationId);
 
                 int stationId = Integer.parseInt(itemElement.getElementsByTagName("stId").item(0).getTextContent());
 
