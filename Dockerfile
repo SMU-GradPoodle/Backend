@@ -8,8 +8,5 @@ RUN apk update && apk add --no-cache py3-pip && \
 # Spring Boot JAR 파일 복사 및 실행
 ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-jar", "/app.jar"]
-
-
-
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "/app.jar"]
 
