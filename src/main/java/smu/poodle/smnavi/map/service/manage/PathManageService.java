@@ -11,7 +11,7 @@ import smu.poodle.smnavi.map.domain.path.SubPath;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.dto.WaypointDto;
-import smu.poodle.smnavi.map.odsay.RouteDetailPositionApi;
+import smu.poodle.smnavi.map.externapi.odsay.RouteDetailPositionApi;
 import smu.poodle.smnavi.map.service.EdgeService;
 import smu.poodle.smnavi.map.service.FullPathService;
 import smu.poodle.smnavi.map.service.SubPathService;

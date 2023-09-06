@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.odsay;
+package smu.poodle.smnavi.map.externapi.odsay;
 
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;

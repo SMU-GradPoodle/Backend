@@ -1,5 +1,6 @@
 package smu.poodle.smnavi.map.externapi.util;
 
+import lombok.experimental.UtilityClass;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -11,7 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
-@Component
+@UtilityClass
 public class XmlApiUtil {
     public Document getRootTag(String url) {
         try {

@@ -27,21 +27,4 @@ public class AccidentService {
         //반환
         return accidentRepository.findTopThree().stream().map(AccidentDto.Info::of).toList();
     }
-
-    @Scheduled(cron = "0 0/10 7-17 * * *")
-    public void catchAccidentInfo() {
-        List<AccidentData> trafficIssue = busArriveInfoApi.getTrafficIssue();
-
-        for (AccidentData accidentData : trafficIssue) {
-            if(accidentData != null) {
-                List<Waypoint> busStation = busStationRepository.findAllByLocalStationId(String.valueOf(accidentData.getStationId()));
-                if(!busStation.isEmpty()) {
-                    accidentRepository.save(Accident.builder()
-                                    .waypoint(busStation.get(0))
-                                    .message(accidentData.message)
-                            .build());
-                }
-            }
-        }
-    }
 }

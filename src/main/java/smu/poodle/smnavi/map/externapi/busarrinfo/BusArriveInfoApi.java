@@ -2,7 +2,6 @@ package smu.poodle.smnavi.map.externapi.busarrinfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -10,12 +9,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import smu.poodle.smnavi.map.dto.BusArriveInfoDto;
 import smu.poodle.smnavi.map.externapi.util.XmlApiUtil;
-import smu.poodle.smnavi.map.service.BusRealTimeLocateService;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,9 +24,6 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @Component
 public class BusArriveInfoApi {
-    private final XmlApiUtil xmlApiUtil;
-    private final BusRealTimeLocateService busRealTimeLocateService;
-
     private final String BUS_ROUTE_ID_7016 = "100100447";
     private final int START_OF_CAUTION_STATION_ORDER_7016 = 36; //용산e편한세상?
     private final int END_OF_CAUTION_STATION_ORDER_7016 = 50; //효자동
@@ -47,7 +40,7 @@ public class BusArriveInfoApi {
     }
 
     public List<BusArriveInfoDto> parseDtoFromXml() {
-        Document xmlContent = xmlApiUtil.getRootTag(makeUrl(BUS_ROUTE_ID_7016));
+        Document xmlContent = XmlApiUtil.getRootTag(makeUrl(BUS_ROUTE_ID_7016));
         Element msgBody = (Element) xmlContent.getElementsByTagName("msgBody").item(0);
 
         NodeList itemList = msgBody.getElementsByTagName("itemList");
@@ -68,17 +61,9 @@ public class BusArriveInfoApi {
                 String firstArrivalNextStationId = itemElement.getElementsByTagName("nstnId1").item(0).getTextContent();
                 String secondArrivalNextStationId = itemElement.getElementsByTagName("nstnId2").item(0).getTextContent();
 
-                log.info("첫 번째 도착 메시지: {}", firstArrivalMessage);
-                log.info("두 번째 도착 메시지: {}", secondArrivalMessage);
-
-                log.info("첫 번째 도착 차량 번호판: {}", firstArrivalLicensePlate);
-                log.info("두 번째 도착 차량 번호판: {}", secondArrivalLicensePlate);
-
-                log.info("첫 번째 도착 다음 정류장 ID: {}", firstArrivalNextStationId);
-                log.info("두 번째 도착 다음 정류장 ID: {}", secondArrivalNextStationId);
-
                 int stationId = Integer.parseInt(itemElement.getElementsByTagName("stId").item(0).getTextContent());
 
+                String stationName = itemElement.getElementsByTagName("stNm").item(0).getTextContent();
                 boolean isStationNonStop = itemElement.getElementsByTagName("deTourAt").item(0).getTextContent().equals("11");
 
                 busArriveInfoDtoList.add(BusArriveInfoDto.builder()
@@ -91,6 +76,7 @@ public class BusArriveInfoApi {
                         .secondArrivalNextStationId(secondArrivalNextStationId)
                         .firstArrivalStationOrder(calculateStationOrder(firstArrivalMessage, i))
                         .secondArrivalStationOrder(calculateStationOrder(secondArrivalMessage, i))
+                        .stationName(stationName)
                         .isStationNonStop(isStationNonStop)
                         .stationOrder(i)
                         .build());
@@ -98,26 +84,6 @@ public class BusArriveInfoApi {
         }
 
         return busArriveInfoDtoList;
-    }
-
-    public boolean isArrivingSoon(String arriveMessage) {
-        return arriveMessage.equals("곧 도착");
-    }
-
-    public List<Integer> extractNumbers(String arriveMessage) {
-        List<Integer> numbers = new ArrayList<>();
-
-        String regex = "\\d+";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(arriveMessage);
-
-        while (matcher.find()) {
-            String numberStr = matcher.group();
-            int number = Integer.parseInt(numberStr);
-            numbers.add(number);
-        }
-
-        return numbers;
     }
 
     public int parseTimeString(String arriveMessage) {
@@ -138,6 +104,27 @@ public class BusArriveInfoApi {
         return (minutes * 60) + seconds;
     }
 
+    public boolean isArrivingSoon(String arriveMessage) {
+        return arriveMessage.equals("곧 도착");
+    }
+
+
+    public List<Integer> extractNumbers(String arriveMessage) {
+        List<Integer> numbers = new ArrayList<>();
+
+        String regex = "\\d+";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(arriveMessage);
+
+        while (matcher.find()) {
+            String numberStr = matcher.group();
+            int number = Integer.parseInt(numberStr);
+            numbers.add(number);
+        }
+
+        return numbers;
+    }
+
     public int calculateStationOrder(String arriveMessage, int stationOrder) {
         if (isArrivingSoon(arriveMessage))
             return stationOrder;
@@ -152,91 +139,5 @@ public class BusArriveInfoApi {
         }
 
         return stationOrder - diffOrder;
-    }
-
-    public List<AccidentData> getTrafficIssue() {
-        List<BusArriveInfoDto> busArriveInfoDtoList = parseDtoFromXml();
-        busRealTimeLocateService.checkTrafficErrorByBusMovement(busArriveInfoDtoList);
-
-        List<AccidentData> accidentDataList = new ArrayList<>();
-        accidentDataList.add(isSpacingTooLarge(busArriveInfoDtoList));
-        accidentDataList.add(isSpacingTooNarrow(busArriveInfoDtoList));
-        accidentDataList.add(isNonStop(busArriveInfoDtoList));
-
-        return accidentDataList;
-    }
-
-    public AccidentData isSpacingTooLarge(List<BusArriveInfoDto> busArriveInfoDtoList) {
-        for (BusArriveInfoDto busArriveInfoDto : busArriveInfoDtoList) {
-            int intervalSecond = busArriveInfoDto.getSecondArrivalSeconds() - busArriveInfoDto.getFirstArrivalSeconds();
-            System.out.println(intervalSecond);
-            if (intervalSecond >= 1200) {
-                return AccidentData.builder()
-                        .stationId(busArriveInfoDto.getStationId())
-                        .message("배차간격이 " + intervalSecond / 60 + "분 이상입니다.")
-                        .build();
-            }
-        }
-        return null;
-    }
-
-    public AccidentData isSpacingTooNarrow(List<BusArriveInfoDto> busArriveInfoDtoList) {
-        List<Integer> busLocatedStationOrderList = createBusLocatedStationOrderList(busArriveInfoDtoList);
-
-        Queue<Integer> busQueue = new LinkedList<>();
-
-        for (Integer busLocatedStationOrder : busLocatedStationOrderList) {
-            busQueue.offer(busLocatedStationOrder);
-
-            while (!busQueue.isEmpty() && busLocatedStationOrder - busQueue.peek() > 2) {
-                busQueue.poll();
-            }
-
-            if (busQueue.size() >= 3) {
-                for (BusArriveInfoDto busArriveInfoDto : busArriveInfoDtoList) {
-                    if (busArriveInfoDto.getStationOrder() == busLocatedStationOrder) {
-                        return AccidentData.builder()
-                                .stationId(busArriveInfoDto.getStationId())
-                                .message("해당 정류장 근처에서 통행 이상이 있습니다.")
-                                .build();
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public AccidentData isNonStop(List<BusArriveInfoDto> busArriveInfoDtoList) {
-        for (BusArriveInfoDto busArriveInfoDto : busArriveInfoDtoList) {
-            if (busArriveInfoDto.isStationNonStop())
-                return AccidentData.builder()
-                        .stationId(busArriveInfoDto.getStationId())
-                        .message("해당 정류장에서 우회중입니다.")
-                        .build();
-        }
-        return null;
-    }
-
-    public List<Integer> createBusLocatedStationOrderList(List<BusArriveInfoDto> busArriveInfoDtoList) {
-        List<Integer> busLocatedStationOrderList = new ArrayList<>();
-
-        busLocatedStationOrderList.add(busArriveInfoDtoList.get(0).getSecondArrivalStationOrder());
-        busLocatedStationOrderList.add(busArriveInfoDtoList.get(0).getFirstArrivalStationOrder());
-
-        for (int i = 1; i < busArriveInfoDtoList.size(); i++) {
-            BusArriveInfoDto curBusStation = busArriveInfoDtoList.get(i);
-
-            int firstArrivalStationOrder = curBusStation.getFirstArrivalStationOrder();
-            int secondArrivalStationOrder = curBusStation.getSecondArrivalStationOrder();
-
-            if (firstArrivalStationOrder == curBusStation.getStationOrder()) {
-                busLocatedStationOrderList.add(firstArrivalStationOrder);
-                if (secondArrivalStationOrder == curBusStation.getStationOrder()) {
-                    busLocatedStationOrderList.add(secondArrivalStationOrder);
-                }
-            }
-        }
-
-        return busLocatedStationOrderList;
     }
 }
