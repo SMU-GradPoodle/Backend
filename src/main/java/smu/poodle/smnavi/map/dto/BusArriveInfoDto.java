@@ -21,6 +21,6 @@ public class BusArriveInfoDto {
     String secondArrivalNextStationId;
     int firstArrivalStationOrder;
     int secondArrivalStationOrder;
+    String stationName;
     boolean isStationNonStop;
-
 }

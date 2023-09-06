@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import smu.poodle.smnavi.map.dto.PathDto;
-import smu.poodle.smnavi.map.odsay.TransitRouteApi;
+import smu.poodle.smnavi.map.externapi.odsay.TransitRouteApi;
 import smu.poodle.smnavi.map.response.BaseResponse;
 import smu.poodle.smnavi.map.response.TransitResponse;
 import smu.poodle.smnavi.map.service.PathService;

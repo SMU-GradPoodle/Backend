@@ -2,6 +2,7 @@ package smu.poodle.smnavi.map.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import smu.poodle.smnavi.map.domain.Accident;
@@ -12,10 +13,12 @@ import smu.poodle.smnavi.map.domain.station.Waypoint;
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BusRealTimeLocationDto {
+@EqualsAndHashCode(of = "licensePlate")
+public class BusPositionDto {
     String licensePlate;
     int stationOrder;
     String stationId;
+    int secondsDifferenceFromFrontBus;
 
     public Accident toAccidentEntity(Waypoint waypoint) {
         return Accident.builder()

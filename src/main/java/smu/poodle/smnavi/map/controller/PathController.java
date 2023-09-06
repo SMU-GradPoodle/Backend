@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.dto.RouteDto;
+import smu.poodle.smnavi.map.redis.domain.BusPosition;
 import smu.poodle.smnavi.map.response.BaseResponse;
 import smu.poodle.smnavi.map.response.TransitResponse;
 import smu.poodle.smnavi.map.service.PathService;
@@ -46,8 +47,6 @@ public class PathController {
     public ResponseEntity<List<AbstractWaypointDto>> getRouteList() {
         return new ResponseEntity<>(pathService.getRouteList(), HttpStatus.OK);
     }
-
-
 }
 
 
