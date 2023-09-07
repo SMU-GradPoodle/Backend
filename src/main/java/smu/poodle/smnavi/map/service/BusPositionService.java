@@ -37,8 +37,8 @@ public class BusPositionService {
     private final BusStationRepository busStationRepository;
     private final BusPositionRepository busPositionRepository;
 
-    @Profile("prod")
     @Scheduled(cron = "0 0/10 7-17 * * *")
+    @Transactional
     public void catchAccidentInfo() {
         List<AccidentData> trafficIssue = guessTrafficIssue();
 

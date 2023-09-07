@@ -36,9 +36,8 @@ public class BusPositionApi {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0/1 12-23 * * *")
+    @Scheduled(cron = "0 0/5 9-18 * * *")
     public void cachingBusPosition() {
-        log.info("로컬 프로필에서만 실행");
         Document xmlContent = XmlApiUtil.getRootTag(getUrl(MonitoringBus.BUS_7016));
         Element msgBody = (Element) xmlContent.getElementsByTagName("msgBody").item(0);
 
