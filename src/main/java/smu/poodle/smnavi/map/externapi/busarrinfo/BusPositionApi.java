@@ -36,7 +36,7 @@ public class BusPositionApi {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0/5 9-18 * * *")
+    @Scheduled(cron = "0 0/5 9-23 * * *")
     public void cachingBusPosition() {
         Document xmlContent = XmlApiUtil.getRootTag(getUrl(MonitoringBus.BUS_7016));
         Element msgBody = (Element) xmlContent.getElementsByTagName("msgBody").item(0);
