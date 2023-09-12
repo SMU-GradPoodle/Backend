@@ -10,10 +10,13 @@ import smu.poodle.smnavi.map.domain.Accident;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.map.dto.BusArriveInfoDto;
 import smu.poodle.smnavi.map.dto.BusPositionDto;
+import smu.poodle.smnavi.map.dto.TestBusPositionDto;
 import smu.poodle.smnavi.map.externapi.busarrinfo.AccidentData;
 import smu.poodle.smnavi.map.externapi.busarrinfo.BusArriveInfoApi;
+import smu.poodle.smnavi.map.redis.BusPositionLogRedisRepository;
 import smu.poodle.smnavi.map.redis.BusPositionRepository;
 import smu.poodle.smnavi.map.redis.domain.BusPosition;
+import smu.poodle.smnavi.map.redis.domain.BusPositionLog;
 import smu.poodle.smnavi.map.redis.domain.IssueOfBusNonStop;
 import smu.poodle.smnavi.map.redis.IssueOfBusNonStopRepository;
 import smu.poodle.smnavi.map.redis.domain.IssueOfBusSpacingLarge;
@@ -36,6 +39,7 @@ public class BusPositionService {
     private final AccidentRepository accidentRepository;
     private final BusStationRepository busStationRepository;
     private final BusPositionRepository busPositionRepository;
+    private final BusPositionLogRedisRepository busPositionLogRedisRepository;
 
     @Scheduled(cron = "0 0/10 7-17 * * *")
     @Transactional
@@ -51,6 +55,21 @@ public class BusPositionService {
                             .message(accidentData.message)
                             .build());
                 }
+            }
+        }
+    }
+
+    public void catchAccidentInfo(List<BusPositionLog> busPositionLogList) {
+        Iterable<BusPositionLog> busPositionLogIterable = busPositionLogRedisRepository.findAll();
+
+        Map<String, BusPositionLog> busPositionLogMap = new HashMap<>();
+        for (BusPositionLog log : busPositionLogIterable) {
+            busPositionLogMap.put(log.getLicensePlate(), log);
+        }
+
+        for (BusPositionLog busPositionLog : busPositionLogList) {
+            BusPositionLog cachedbusPositionLog = busPositionLogMap.get(busPositionLog.getLicensePlate());
+            if (Objects.equals(cachedbusPositionLog.getSectionOrder(), busPositionLog.getSectionOrder())) {
             }
         }
     }
@@ -153,29 +172,29 @@ public class BusPositionService {
 
     @Transactional
     public void checkTrafficErrorByBusMovement(List<BusArriveInfoDto> busArriveInfoDtoList) {
-        Map<String, BusPositionDto> busRealTimeLocationDtoMap = parseMapFromDto(busArriveInfoDtoList);
-
-        for (String licensePlate : busRealTimeLocationDtoMap.keySet()) {
-            BusPositionDto busPositionDto = busRealTimeLocationDtoMap.get(licensePlate);
-            busRealTimeLocateLogRepository.save(busPositionDto.toLogEntity("7016"));
-            busRealTimeLocateRepository.findByLicensePlate(licensePlate).ifPresentOrElse(
-                    busRealTimeLocateInfo -> {
-                        if (busRealTimeLocateInfo.getStationOrder() == busPositionDto.getStationOrder()) {
-                            List<Waypoint> busStation = busStationRepository.findAllByLocalStationId(busPositionDto.getStationId());
-
-                            if (!busStation.isEmpty()) {
-                                accidentRepository.save(busPositionDto.toAccidentEntity(busStation.get(0)));
-                            }
-                        } else {
-                            busRealTimeLocateInfo.setStationId(busPositionDto.getStationId());
-                            busRealTimeLocateInfo.setStationOrder(busPositionDto.getStationOrder());
-                        }
-                    },
-                    () -> busRealTimeLocateRepository.save(busPositionDto.toInfoEntity("7016"))
-            );
-        }
-
-        busRealTimeLocateRepository.deleteAllOutOfBoundBusInfo(busRealTimeLocationDtoMap.keySet());
+//        Map<String, BusPositionDto> busRealTimeLocationDtoMap = parseMapFromDto(busArriveInfoDtoList);
+//
+//        for (String licensePlate : busRealTimeLocationDtoMap.keySet()) {
+//            BusPositionDto busPositionDto = busRealTimeLocationDtoMap.get(licensePlate);
+//            busRealTimeLocateLogRepository.save(busPositionDto.toLogEntity("7016"));
+//            busRealTimeLocateRepository.findByLicensePlate(licensePlate).ifPresentOrElse(
+//                    busRealTimeLocateInfo -> {
+//                        if (busRealTimeLocateInfo.getStationOrder() == busPositionDto.getStationOrder()) {
+//                            List<Waypoint> busStation = busStationRepository.findAllByLocalStationId(busPositionDto.getStationId());
+//
+//                            if (!busStation.isEmpty()) {
+//                                accidentRepository.save(busPositionDto.toAccidentEntity(busStation.get(0)));
+//                            }
+//                        } else {
+//                            busRealTimeLocateInfo.setStationId(busPositionDto.getStationId());
+//                            busRealTimeLocateInfo.setStationOrder(busPositionDto.getStationOrder());
+//                        }
+//                    },
+//                    () -> busRealTimeLocateRepository.save(busPositionDto.toInfoEntity("7016"))
+//            );
+//        }
+//
+//        busRealTimeLocateRepository.deleteAllOutOfBoundBusInfo(busRealTimeLocationDtoMap.keySet());
 
     }
 
@@ -210,5 +229,19 @@ public class BusPositionService {
     @Transactional
     public List<BusPosition> getBusPositionList() {
         return (List<BusPosition>) busPositionRepository.findAll();
+    }
+
+    public List<TestBusPositionDto> getTestBusPosition() {
+        List<TestBusPositionDto> busPositions = new ArrayList<>();
+
+        // 더미 데이터 생성
+        busPositions.add(new TestBusPositionDto("서울70사7744", "126.977167", "37.569005", false, null));
+        busPositions.add(new TestBusPositionDto("서울70사7785", "126.972283", "37.577671", true, "KT광화문지사, 버스 지연"));
+        busPositions.add(new TestBusPositionDto("서울70사7749", "126.957672", "37.599789", false, null));
+        busPositions.add(new TestBusPositionDto("서울70사7797", "126.957371", "37.599717", false, null));
+        busPositions.add(new TestBusPositionDto("서울70사7781", "126.956677", "37.600947", false, null));
+        busPositions.add(new TestBusPositionDto("서울70사7773", "126.972338", "37.541974", false, null));
+
+        return busPositions;
     }
 }

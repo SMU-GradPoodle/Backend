@@ -2,7 +2,6 @@ package smu.poodle.smnavi.map.externapi.busarrinfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,9 +9,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import smu.poodle.smnavi.map.externapi.util.XmlApiUtil;
+import smu.poodle.smnavi.map.redis.BusPositionLogRedisRepository;
 import smu.poodle.smnavi.map.redis.BusPositionRepository;
 import smu.poodle.smnavi.map.redis.domain.BusPosition;
+import smu.poodle.smnavi.map.redis.domain.BusPositionLog;
+import smu.poodle.smnavi.map.service.BusPositionService;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +26,8 @@ import java.util.List;
 public class BusPositionApi {
 
     private final BusPositionRepository busPositionRepository;
+    private final BusPositionLogRedisRepository busPositionLogRedisRepository;
+    private final BusPositionService busPositionService;
 
     private String getUrl(MonitoringBus monitoringBus) {
         final String URL = "http://ws.bus.go.kr/api/rest/buspos/getBusPosByRouteSt?ServiceKey=%s&busRouteId=%s&startOrd=%d&endOrd=%d";
@@ -51,12 +57,22 @@ public class BusPositionApi {
             String licensePlate = element.getElementsByTagName("plainNo").item(0).getTextContent();
             String gpsX = element.getElementsByTagName("tmX").item(0).getTextContent();
             String gpsY = element.getElementsByTagName("tmY").item(0).getTextContent();
+            int sectionOrder = Integer.parseInt(element.getElementsByTagName("sectOrd").item(0).getTextContent());
 
             busPositionList.add(BusPosition.builder()
                     .licensePlate(licensePlate)
+                    .sectionOrder(sectionOrder)
                     .gpsX(gpsX)
                     .gpsY(gpsY)
                     .build());
+        }
+
+        ZonedDateTime now = ZonedDateTime.now();
+        int minutesSinceSevenAM = now.getHour() * 60 + now.getMinute() - 7 * 60;
+        if (minutesSinceSevenAM % 8 == 0) {
+            busPositionService.catchAccidentInfo();
+            log.info(now.format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss")) + " 버스 교통 이슈 확인");
+            busPositionLogRedisRepository.saveAll(BusPositionLog.convertBusPositionList(busPositionList));
         }
 
         busPositionRepository.deleteAll();
