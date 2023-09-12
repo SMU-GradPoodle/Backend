@@ -49,7 +49,7 @@ public class TipOffController {
     public ResponseEntity<?> updateInfo(@PathVariable(value = "id") Long id, @RequestBody TipOffRequestDto tipOffRequestDto) {
         Optional<TipOff> updateInfo = tipOffService.updateInfo(id, tipOffRequestDto);
         if (updateInfo.isPresent()) {
-            return ResponseEntity.ok().body(updateInfo);
+            return ResponseEntity.ok().body(tipOffRequestDto);
         } else {
             return ResponseEntity.notFound().build();
         }
