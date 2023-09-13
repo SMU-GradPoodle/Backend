@@ -23,6 +23,7 @@ public class Accident extends BaseTimeEntity {
     private Kind kind;
 
     private String message;
+
     @ManyToOne
     private Waypoint waypoint;
 }

@@ -25,7 +25,7 @@ public class NoticeDto {
     private String title;
 
     @NotEmpty(message = "내용은 필수 항목 입니다.")
-    @Size(min = 1, max = 5000, message = "내용은 10자 이상 5000자 이하로 입력해주세요.")
+    @Size(min = 1, max = 5000, message = "내용은 1자 이상 5000자 이하로 입력해주세요.")
     private String content;
 
     public NoticeDto(){
