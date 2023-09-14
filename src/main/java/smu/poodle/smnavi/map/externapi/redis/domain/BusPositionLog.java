@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.redis.domain;
+package smu.poodle.smnavi.map.externapi.redis.domain;
 
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -2,13 +2,15 @@ package smu.poodle.smnavi.map.externapi.busarrinfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import smu.poodle.smnavi.map.dto.BusArriveInfoDto;
 import smu.poodle.smnavi.map.externapi.util.XmlApiUtil;
+import smu.poodle.smnavi.map.externapi.redis.BusArriveInfoRedisRepository;
+import smu.poodle.smnavi.map.externapi.redis.domain.BusArriveInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +26,8 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @Component
 public class BusArriveInfoApi {
-    private final String BUS_ROUTE_ID_7016 = "100100447";
-    private final int START_OF_CAUTION_STATION_ORDER_7016 = 36; //용산e편한세상?
-    private final int END_OF_CAUTION_STATION_ORDER_7016 = 50; //효자동
+
+    private final BusArriveInfoRedisRepository busArriveInfoRedisRepository;
 
     private String makeUrl(String busRouteId) {
 
@@ -39,15 +40,16 @@ public class BusArriveInfoApi {
                 + "busRouteId=" + busRouteId;
     }
 
-    public List<BusArriveInfoDto> parseDtoFromXml() {
-        Document xmlContent = XmlApiUtil.getRootTag(makeUrl(BUS_ROUTE_ID_7016));
+    @Scheduled(cron = "0 0/1 6-20 * * *")
+    public void parseDtoFromXml() {
+        Document xmlContent = XmlApiUtil.getRootTag(makeUrl(MonitoringBus.BUS_7016.getBusRouteId()));
         Element msgBody = (Element) xmlContent.getElementsByTagName("msgBody").item(0);
 
         NodeList itemList = msgBody.getElementsByTagName("itemList");
 
-        List<BusArriveInfoDto> busArriveInfoDtoList = new ArrayList<>();
+        List<BusArriveInfo> busArriveInfoList = new ArrayList<>();
 
-        for (int i = START_OF_CAUTION_STATION_ORDER_7016; i < END_OF_CAUTION_STATION_ORDER_7016; i++) {
+        for (int i = MonitoringBus.BUS_7016.getMonitoringStartStationOrder(); i < MonitoringBus.BUS_7016.getMonitoringEndStationOrder(); i++) {
             Node itemNode = itemList.item(i);
             if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element itemElement = (Element) itemNode;
@@ -55,38 +57,28 @@ public class BusArriveInfoApi {
                 String firstArrivalMessage = itemElement.getElementsByTagName("arrmsg1").item(0).getTextContent();
                 String secondArrivalMessage = itemElement.getElementsByTagName("arrmsg2").item(0).getTextContent();
 
-                String firstArrivalLicensePlate = itemElement.getElementsByTagName("plainNo1").item(0).getTextContent();
-                String secondArrivalLicensePlate = itemElement.getElementsByTagName("plainNo2").item(0).getTextContent();
-
-                String firstArrivalNextStationId = itemElement.getElementsByTagName("nstnId1").item(0).getTextContent();
-                String secondArrivalNextStationId = itemElement.getElementsByTagName("nstnId2").item(0).getTextContent();
-
                 int stationId = Integer.parseInt(itemElement.getElementsByTagName("stId").item(0).getTextContent());
 
-                String stationName = itemElement.getElementsByTagName("stNm").item(0).getTextContent();
                 boolean isStationNonStop = itemElement.getElementsByTagName("deTourAt").item(0).getTextContent().equals("11");
 
-                busArriveInfoDtoList.add(BusArriveInfoDto.builder()
-                        .stationId(stationId)
-                        .firstArrivalSeconds(parseTimeString(firstArrivalMessage))
-                        .secondArrivalSeconds(parseTimeString(secondArrivalMessage))
-                        .firstArrivalLicensePlate(firstArrivalLicensePlate)
-                        .secondArrivalLicensePlate(secondArrivalLicensePlate)
-                        .firstArrivalNextStationId(firstArrivalNextStationId)
-                        .secondArrivalNextStationId(secondArrivalNextStationId)
-                        .firstArrivalStationOrder(calculateStationOrder(firstArrivalMessage, i))
-                        .secondArrivalStationOrder(calculateStationOrder(secondArrivalMessage, i))
-                        .stationName(stationName)
-                        .isStationNonStop(isStationNonStop)
-                        .stationOrder(i)
+                boolean isLargeInterval = parseSecondsFromString(firstArrivalMessage) >= 15 * 60;
+                busArriveInfoList.add(BusArriveInfo.builder()
+                        .stationId(String.valueOf(stationId))
+                        .firstArriveMessage(firstArrivalMessage)
+                        .secondArriveMessage(secondArrivalMessage)
+                        .isNonstop(isStationNonStop)
+                        .isLargeInterval(isLargeInterval)
+                        .hasIssue(isStationNonStop || isLargeInterval)
                         .build());
             }
         }
 
-        return busArriveInfoDtoList;
+        log.info("정보 저장");
+        busArriveInfoRedisRepository.deleteAll();
+        busArriveInfoRedisRepository.saveAll(busArriveInfoList);
     }
 
-    public int parseTimeString(String arriveMessage) {
+    public int parseSecondsFromString(String arriveMessage) {
         if (isArrivingSoon(arriveMessage))
             return 60;
 
@@ -123,21 +115,5 @@ public class BusArriveInfoApi {
         }
 
         return numbers;
-    }
-
-    public int calculateStationOrder(String arriveMessage, int stationOrder) {
-        if (isArrivingSoon(arriveMessage))
-            return stationOrder;
-
-        int diffOrder = 0;
-        List<Integer> extractedNumber = extractNumbers(arriveMessage);
-
-        if (extractedNumber.size() == 2) {
-            diffOrder = extractedNumber.get(1);
-        } else if (extractedNumber.size() == 3) {
-            diffOrder = extractedNumber.get(2);
-        }
-
-        return stationOrder - diffOrder;
     }
 }
