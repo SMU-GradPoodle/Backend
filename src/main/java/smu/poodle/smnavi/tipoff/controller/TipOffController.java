@@ -1,5 +1,6 @@
 package smu.poodle.smnavi.tipoff.controller;
 
+import com.amazonaws.Response;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -28,15 +29,15 @@ public class TipOffController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/api/info") //제보 전체 조회
+    public BaseResponse<PageResult<TipOffResponseDto.Detail>> getTipOffList(@RequestParam(required = false) String keyword,
+                                                                            Pageable pageable) {
+        return BaseResponse.ok(tipOffService.getTipOffList(keyword, pageable));
+    }
     @GetMapping("/api/info/{id}") //제보 id별로 조회
-    public ResponseEntity<?> getInfoById(@PathVariable(value = "id") Long id) {
-        Optional<TipOffRequestDto> infoDtoId = tipOffService.getInfoById(id);
-        if (infoDtoId.isPresent()) {
-            tipOffService.increaseViews(id);
-            return ResponseEntity.ok().body(infoDtoId.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public BaseResponse<TipOffResponseDto.Detail>getTipOffById(@PathVariable(value = "id") Long id) {
+        TipOffResponseDto.Detail infoDtoId = tipOffService.getTipOffById(id);
+        return BaseResponse.ok(infoDtoId);
     }
 
     @GetMapping("/api/info/button")
@@ -47,20 +48,14 @@ public class TipOffController {
 
     @PutMapping("/api/info/{id}") //수정
     public ResponseEntity<?> updateInfo(@PathVariable(value = "id") Long id, @RequestBody TipOffRequestDto tipOffRequestDto) {
-        Optional<TipOff> updateInfo = tipOffService.updateInfo(id, tipOffRequestDto);
-        if (updateInfo.isPresent()) {
+        TipOffResponseDto.Detail updateInfo = tipOffService.updateInfo(id, tipOffRequestDto);
+        if (updateInfo != null) {
             return ResponseEntity.ok().body(tipOffRequestDto);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @GetMapping("/api/info") //제보 전체 조회
-    public BaseResponse<PageResult<TipOffResponseDto.Detail>> getTipOffList(@RequestParam(required = false) String keyword,
-                                                                     Pageable pageable) {
-
-        return BaseResponse.ok(tipOffService.getTipOffList(keyword, pageable));
-    }
 
     @DeleteMapping("/api/info/{id}") //제보 글 삭제
     public ResponseEntity<?> deleteInfoId(@PathVariable(value = "id") Long id) {

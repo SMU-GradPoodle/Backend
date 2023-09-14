@@ -15,7 +15,9 @@ import smu.poodle.smnavi.map.repository.AccidentRepository;
 import smu.poodle.smnavi.map.repository.BusStationRepository;
 import smu.poodle.smnavi.map.repository.SubwayStationRepository;
 import smu.poodle.smnavi.tipoff.domain.Location;
+import smu.poodle.smnavi.tipoff.domain.Thumb;
 import smu.poodle.smnavi.tipoff.domain.TipOff;
+import smu.poodle.smnavi.tipoff.dto.LikeInfoDto;
 import smu.poodle.smnavi.tipoff.dto.LocationDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffRequestDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffResponseDto;
@@ -54,6 +56,14 @@ public class TipOffService {
         tipOffRepository.save(tipOff);
     }
 
+    public TipOffResponseDto.Detail updateInfo(Long id, TipOffRequestDto tipOffRequestDto) {
+        TipOff tipOff = tipOffRepository.findById(id)
+                .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        tipOff.setContent(tipOffRequestDto.getContent());
+        tipOffRepository.save(tipOff);
+        return TipOffResponseDto.Detail.of(tipOff,thumbService.getLikeInfo(tipOff.getId()));
+    }
     //todo : accident 가 아니라 다른걸로 대체 필요
     private void createAccident(TipOff tipOff){
         Accident accident = Accident.builder()
@@ -68,24 +78,20 @@ public class TipOffService {
     public PageResult<TipOffResponseDto.Detail> getTipOffList(String keyword, Pageable pageable) {
         Page<TipOff> tipOffPage = tipOffRepository.findByQuery(keyword, pageable);
 
-        return PageResult.of(tipOffPage.map((tipOff -> {
-            return TipOffResponseDto.Detail.of(tipOff,
-                    thumbService.getLikeInfo(tipOff.getId()));
-        })));
+        return PageResult.of(tipOffPage.map((tipOff -> TipOffResponseDto.Detail.of(tipOff,
+                thumbService.getLikeInfo(tipOff.getId())))));
+    }
+    public TipOffResponseDto.Detail getTipOffById(Long id) {
+        Optional<TipOff> tipOff = tipOffRepository.findById(id);
+        if(tipOff.isPresent()){
+            TipOff tipOff1 = tipOff.get();
+            LikeInfoDto likeInfoDto = thumbService.getLikeInfo(tipOff1.getId());
+            return TipOffResponseDto.Detail.of(tipOff1,likeInfoDto);
+        }
+        return null;
     }
 
-    public Optional<TipOff> updateInfo(Long id, TipOffRequestDto tipOffRequestDto) {
-        LocalDateTime updateTime = LocalDateTime.now().minusMinutes(1);
-        int infoCount = 0;
-        if (infoCount > 0) {
-            throw new RestApiException(DetailErrorCode.NOT_MODIFY_ERROR);
-        }
-        TipOff tipOff = tipOffRepository.findById(id)
-                .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
-        tipOff.setContent(tipOffRequestDto.getContent());
-        tipOffRepository.save(tipOff);
-        return Optional.of(tipOff);
-    }
+
 
     public void increaseViews(Long id) {
         TipOff tipOff = tipOffRepository.findById(id)
@@ -94,13 +100,7 @@ public class TipOffService {
         tipOffRepository.save(tipOff);
     }
 
-    public Optional<TipOffRequestDto> getInfoById(Long id) {
-        Optional<TipOff> infoEntity = tipOffRepository.findById(id);
-        Optional<TipOffRequestDto> infoDto = Optional.ofNullable(TipOffRequestDto.builder()
-                .content(infoEntity.get().getContent())
-                .build());
-        return infoDto;
-    }
+
 
     public Long deleteInfoId(Long id) {
         Optional<TipOff> infoEntity = tipOffRepository.findById(id);
