@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import smu.poodle.smnavi.common.dto.PageResult;
 import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
@@ -41,8 +42,7 @@ public class TipOffService {
         if (tipOff.getTransitType() == TransitType.BUS) {
             Waypoint waypoint = busStationRepository.findAllByLocalStationId(tipOffRequestDto.getStationId()).get(0);
             tipOff.setWaypoint(waypoint);
-        }
-        else if (tipOff.getTransitType() == TransitType.SUBWAY) {
+        } else if (tipOff.getTransitType() == TransitType.SUBWAY) {
             Waypoint waypoint = subwayStationRepository.findAllByStationId(Integer.parseInt(tipOffRequestDto.getStationId())).get(0);
             tipOff.setWaypoint(waypoint);
         }
@@ -56,7 +56,7 @@ public class TipOffService {
 
         tipOff.setContent(tipOffRequestDto.getContent());
         tipOffRepository.save(tipOff);
-        return TipOffResponseDto.Detail.of(tipOff,thumbService.getLikeInfo(tipOff.getId()));
+        return TipOffResponseDto.Detail.of(tipOff, thumbService.getLikeInfo(tipOff.getId()));
     }
 
 
@@ -67,28 +67,27 @@ public class TipOffService {
         return PageResult.of(tipOffPage.map((tipOff -> TipOffResponseDto.Detail.of(tipOff,
                 thumbService.getLikeInfo(tipOff.getId())))));
     }
+
     public TipOffResponseDto.Detail getTipOffById(Long id) {
         Optional<TipOff> tipOff = tipOffRepository.findById(id);
-        if(tipOff.isPresent()){
+        if (tipOff.isPresent()) {
             TipOff tipOff1 = tipOff.get();
             LikeInfoDto likeInfoDto = thumbService.getLikeInfo(tipOff1.getId());
-            return TipOffResponseDto.Detail.of(tipOff1,likeInfoDto);
+            return TipOffResponseDto.Detail.of(tipOff1, likeInfoDto);
         }
         return null;
     }
 
 
-    public Long deleteInfoId(Long id) {
-        Optional<TipOff> infoEntity = tipOffRepository.findById(id);
-        if (!infoEntity.isPresent()) {
-            throw new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND);
-        } else {
-            tipOffRepository.delete(infoEntity.get());
-            return infoEntity.get().getId();
-        }
+    public void deleteTipOff(Long id) {
+        TipOff tipOff = tipOffRepository.findById(id).orElseThrow(() ->
+                new RestApiException(DetailErrorCode.NOT_CERTIFICATED)
+        );
+
+        tipOffRepository.delete(tipOff);
     }
 
-    public List<LocationDto> getBusLocationList() {
+    public List<LocationDto> getTipOffButton() {
         List<Location> busTransitType = Location.getByTransitType(TransitType.BUS);
         List<Location> subTransitType = Location.getByTransitType(TransitType.SUBWAY);
         List<LocationDto> locations = new ArrayList<>();

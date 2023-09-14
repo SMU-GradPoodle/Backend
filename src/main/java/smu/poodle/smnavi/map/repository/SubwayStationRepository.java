@@ -1,8 +1,6 @@
 package smu.poodle.smnavi.map.repository;
 
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import smu.poodle.smnavi.map.domain.station.BusStation;
 import smu.poodle.smnavi.map.domain.station.SubwayStation;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 

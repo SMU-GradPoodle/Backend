@@ -1,6 +1,5 @@
 package smu.poodle.smnavi.tipoff.controller;
 
-import com.amazonaws.Response;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -8,14 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import smu.poodle.smnavi.common.dto.BaseResponse;
 import smu.poodle.smnavi.common.dto.PageResult;
-import smu.poodle.smnavi.tipoff.domain.TipOff;
-import smu.poodle.smnavi.tipoff.dto.LocationDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffRequestDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffResponseDto;
 import smu.poodle.smnavi.tipoff.service.TipOffService;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,9 +25,13 @@ public class TipOffController {
         return BaseResponse.ok(tipOffService.registerTipOff(tipOffRequestDto));
     }
 
+    /**
+     * 제보글 목록 조회
+     */
     @GetMapping("/api/info") //제보 전체 조회
-    public BaseResponse<PageResult<TipOffResponseDto.Detail>> getTipOffList(@RequestParam(required = false) String keyword,
-                                                                            Pageable pageable) {
+    public BaseResponse<PageResult<TipOffResponseDto.Detail>> getTipOffList(
+            @RequestParam(required = false) String keyword,
+            Pageable pageable) {
         return BaseResponse.ok(tipOffService.getTipOffList(keyword, pageable));
     }
 
@@ -50,12 +48,12 @@ public class TipOffController {
     /**
      * 제보 글 버튼 조회 API
      */
+    //todo : BaseResponse 로 리팩토링
     @GetMapping("/api/info/button")
-    public ResponseEntity<?> buttons() {
-        List<LocationDto> locationDto1 = tipOffService.getBusLocationList();
-        return ResponseEntity.ok().body(locationDto1);
-    }
+    public ResponseEntity<?> getTipOffButton() {
 
+        return ResponseEntity.ok().body(tipOffService.getTipOffButton());
+    }
 
     /**
      * 제보 글 수정
@@ -70,14 +68,12 @@ public class TipOffController {
         }
     }
 
-
-    @DeleteMapping("/api/info/{id}") //제보 글 삭제
-    public ResponseEntity<?> deleteInfoId(@PathVariable(value = "id") Long id) {
-        Long deleteinfo = tipOffService.deleteInfoId(id);
-        if (deleteinfo == null) {
-            return ResponseEntity.ok().body(deleteinfo);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    /**
+     * 제보글 삭제
+     */
+    @DeleteMapping("/api/info/{id}")
+    public BaseResponse<Void> deleteTipOff(@PathVariable(value = "id") Long id) {
+        tipOffService.deleteTipOff(id);
+        return BaseResponse.ok();
     }
 }

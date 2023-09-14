@@ -33,5 +33,4 @@ public class BusPositionController {
     public BaseResponse<List<BusArriveInfoDto>> getBusArriveInfo() {
         return BaseResponse.ok(busPositionService.getBusArriveInfo());
     }
-
 }
