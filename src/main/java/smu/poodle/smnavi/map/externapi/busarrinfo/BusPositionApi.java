@@ -9,24 +9,23 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import smu.poodle.smnavi.map.externapi.util.XmlApiUtil;
-import smu.poodle.smnavi.map.redis.BusPositionLogRedisRepository;
-import smu.poodle.smnavi.map.redis.BusPositionRepository;
-import smu.poodle.smnavi.map.redis.domain.BusPosition;
-import smu.poodle.smnavi.map.redis.domain.BusPositionLog;
+import smu.poodle.smnavi.map.externapi.redis.BusPositionRedisRepository;
+import smu.poodle.smnavi.map.externapi.redis.domain.BusPosition;
 import smu.poodle.smnavi.map.service.BusPositionService;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class BusPositionApi {
 
-    private final BusPositionRepository busPositionRepository;
-    private final BusPositionLogRedisRepository busPositionLogRedisRepository;
+    private final BusPositionRedisRepository busPositionRedisRepository;
     private final BusPositionService busPositionService;
 
     private String getUrl(MonitoringBus monitoringBus) {
@@ -42,8 +41,10 @@ public class BusPositionApi {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0/5 9-23 * * *")
+    @Scheduled(cron = "0 0/1 9-23 * * *")
     public void cachingBusPosition() {
+        log.info(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.SSS")) + " 버스 교통 이슈 확인 시작 시간");
+
         Document xmlContent = XmlApiUtil.getRootTag(getUrl(MonitoringBus.BUS_7016));
         Element msgBody = (Element) xmlContent.getElementsByTagName("msgBody").item(0);
 
@@ -64,18 +65,33 @@ public class BusPositionApi {
                     .sectionOrder(sectionOrder)
                     .gpsX(gpsX)
                     .gpsY(gpsY)
+                    .hasIssue(false)
                     .build());
         }
 
-        ZonedDateTime now = ZonedDateTime.now();
-        int minutesSinceSevenAM = now.getHour() * 60 + now.getMinute() - 7 * 60;
-        if (minutesSinceSevenAM % 8 == 0) {
-            busPositionService.catchAccidentInfo();
-            log.info(now.format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss")) + " 버스 교통 이슈 확인");
-            busPositionLogRedisRepository.saveAll(BusPositionLog.convertBusPositionList(busPositionList));
-        }
+        if (ZonedDateTime.now().getMinute() % 6 == 0) {
+            log.info(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.SSS")) + " 버스 교통 이슈 확인");
+            busPositionService.catchAccidentInfo(busPositionList);
+        } else {
+            Iterable<BusPosition> busPositionIterable = busPositionRedisRepository.findAll();
 
-        busPositionRepository.deleteAll();
-        busPositionRepository.saveAll(busPositionList);
+            Map<String, BusPosition> busPositionMap = new HashMap<>();
+
+            for (BusPosition busPosition : busPositionIterable) {
+                busPositionMap.put(busPosition.getLicensePlate(), busPosition);
+            }
+
+            for (BusPosition busPosition : busPositionList) {
+                BusPosition cachedBusPosition = busPositionMap.getOrDefault(busPosition.getLicensePlate(), null);
+
+                if (cachedBusPosition != null && cachedBusPosition.getHasIssue()) {
+                    log.info("기존 이슈에 의해 새로운 이슈 true 설정");
+                    busPosition.setHasIssue(true);
+                }
+            }
+        }
+        busPositionRedisRepository.deleteAll();
+        busPositionRedisRepository.saveAll(busPositionList);
+        log.info(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.SSS")) + " 끝난 시간");
     }
 }

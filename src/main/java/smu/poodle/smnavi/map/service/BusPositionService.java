@@ -2,64 +2,33 @@ package smu.poodle.smnavi.map.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import smu.poodle.smnavi.map.domain.Accident;
-import smu.poodle.smnavi.map.domain.station.Waypoint;
+import smu.poodle.smnavi.map.domain.station.BusStationInfo;
 import smu.poodle.smnavi.map.dto.BusArriveInfoDto;
-import smu.poodle.smnavi.map.dto.BusPositionDto;
 import smu.poodle.smnavi.map.dto.TestBusPositionDto;
-import smu.poodle.smnavi.map.externapi.busarrinfo.AccidentData;
-import smu.poodle.smnavi.map.externapi.busarrinfo.BusArriveInfoApi;
-import smu.poodle.smnavi.map.redis.BusPositionLogRedisRepository;
-import smu.poodle.smnavi.map.redis.BusPositionRepository;
-import smu.poodle.smnavi.map.redis.domain.BusPosition;
-import smu.poodle.smnavi.map.redis.domain.BusPositionLog;
-import smu.poodle.smnavi.map.redis.domain.IssueOfBusNonStop;
-import smu.poodle.smnavi.map.redis.IssueOfBusNonStopRepository;
-import smu.poodle.smnavi.map.redis.domain.IssueOfBusSpacingLarge;
-import smu.poodle.smnavi.map.repository.AccidentRepository;
-import smu.poodle.smnavi.map.repository.BusRealTimeLocateLogRepository;
-import smu.poodle.smnavi.map.repository.BusRealTimeLocateRepository;
-import smu.poodle.smnavi.map.repository.BusStationRepository;
+import smu.poodle.smnavi.map.externapi.redis.BusArriveInfoRedisRepository;
+import smu.poodle.smnavi.map.externapi.redis.BusPositionLogRedisRepository;
+import smu.poodle.smnavi.map.externapi.redis.BusPositionRedisRepository;
+import smu.poodle.smnavi.map.externapi.redis.domain.BusArriveInfo;
+import smu.poodle.smnavi.map.externapi.redis.domain.BusPosition;
+import smu.poodle.smnavi.map.externapi.redis.domain.BusPositionLog;
+import smu.poodle.smnavi.map.repository.BusStationInfoRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class BusPositionService {
-
-    private final BusArriveInfoApi busArriveInfoApi;
-    private final IssueOfBusNonStopRepository issueOfBusNonStopRepository;
-    private final BusRealTimeLocateRepository busRealTimeLocateRepository;
-    private final BusRealTimeLocateLogRepository busRealTimeLocateLogRepository;
-    private final AccidentRepository accidentRepository;
-    private final BusStationRepository busStationRepository;
-    private final BusPositionRepository busPositionRepository;
+    private final BusPositionRedisRepository busPositionRedisRepository;
     private final BusPositionLogRedisRepository busPositionLogRedisRepository;
+    private final BusArriveInfoRedisRepository busArriveInfoRedisRepository;
+    private final BusStationInfoRepository busStationInfoRepository;
 
-    @Scheduled(cron = "0 0/10 7-17 * * *")
-    @Transactional
-    public void catchAccidentInfo() {
-        List<AccidentData> trafficIssue = guessTrafficIssue();
 
-        for (AccidentData accidentData : trafficIssue) {
-            if (accidentData != null) {
-                List<Waypoint> busStation = busStationRepository.findAllByLocalStationId(String.valueOf(accidentData.getStationId()));
-                if (!busStation.isEmpty()) {
-                    accidentRepository.save(Accident.builder()
-                            .waypoint(busStation.get(0))
-                            .message(accidentData.message)
-                            .build());
-                }
-            }
-        }
-    }
-
-    public void catchAccidentInfo(List<BusPositionLog> busPositionLogList) {
+    public void catchAccidentInfo(List<BusPosition> busPositionList) {
         Iterable<BusPositionLog> busPositionLogIterable = busPositionLogRedisRepository.findAll();
 
         Map<String, BusPositionLog> busPositionLogMap = new HashMap<>();
@@ -67,168 +36,23 @@ public class BusPositionService {
             busPositionLogMap.put(log.getLicensePlate(), log);
         }
 
-        for (BusPositionLog busPositionLog : busPositionLogList) {
-            BusPositionLog cachedbusPositionLog = busPositionLogMap.get(busPositionLog.getLicensePlate());
-            if (Objects.equals(cachedbusPositionLog.getSectionOrder(), busPositionLog.getSectionOrder())) {
-            }
-        }
-    }
-
-    public List<AccidentData> guessTrafficIssue() {
-        List<BusArriveInfoDto> busArriveInfoDtoList = busArriveInfoApi.parseDtoFromXml();
-
-        checkTrafficErrorByBusMovement(busArriveInfoDtoList);
-
-        List<AccidentData> accidentDataList = new ArrayList<>();
-        accidentDataList.add(isSpacingTooLarge(busArriveInfoDtoList));
-        accidentDataList.add(isSpacingTooNarrow(busArriveInfoDtoList));
-        updateNonStop(busArriveInfoDtoList);
-
-        return accidentDataList;
-    }
-
-    public AccidentData isSpacingTooNarrow(List<BusArriveInfoDto> busArriveInfoDtoList) {
-        List<Integer> busLocatedStationOrderList = createBusLocatedStationOrderList(busArriveInfoDtoList);
-
-        Queue<Integer> busQueue = new LinkedList<>();
-
-        for (Integer busLocatedStationOrder : busLocatedStationOrderList) {
-            busQueue.offer(busLocatedStationOrder);
-
-            while (!busQueue.isEmpty() && busLocatedStationOrder - busQueue.peek() > 2) {
-                busQueue.poll();
-            }
-
-            if (busQueue.size() >= 3) {
-                for (BusArriveInfoDto busArriveInfoDto : busArriveInfoDtoList) {
-                    if (busArriveInfoDto.getStationOrder() == busLocatedStationOrder) {
-                        return AccidentData.builder()
-                                .stationId(busArriveInfoDto.getStationId())
-                                .message("해당 정류장 근처에서 통행 이상이 있습니다.")
-                                .build();
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    @Transactional
-    public void updateNonStop(List<BusArriveInfoDto> busArriveInfoDtoList) {
-        boolean nonStop = false;
-        String nonStopStartStationName = "", nonStopEndStationName = "";
-        for (BusArriveInfoDto busArriveInfoDto : busArriveInfoDtoList) {
-            if (busArriveInfoDto.isStationNonStop() && !nonStop) {
-                nonStop = true;
-                nonStopStartStationName = busArriveInfoDto.getStationName();
-            } else if (!busArriveInfoDto.isStationNonStop() && nonStop) {
-                nonStopEndStationName = busArriveInfoDto.getStationName();
-                break;
-            }
-        }
-        issueOfBusNonStopRepository.deleteAll();
-
-        if (nonStop) {
-            issueOfBusNonStopRepository.save(IssueOfBusNonStop.builder()
-                    .busName("7016")
-                    .nonStopStartStationName(nonStopStartStationName)
-                    .nonStopEndStationName(nonStopEndStationName)
-                    .build());
-        }
-    }
-
-    public AccidentData isSpacingTooLarge(List<BusArriveInfoDto> busArriveInfoDtoList) {
-        List<IssueOfBusSpacingLarge> issueOfBusSpacingLargeList = new ArrayList<>();
-        for (BusArriveInfoDto busArriveInfoDto : busArriveInfoDtoList) {
-            int intervalSecond = busArriveInfoDto.getSecondArrivalSeconds() - busArriveInfoDto.getFirstArrivalSeconds();
-
-        }
-        return null;
-    }
-
-    public List<Integer> createBusLocatedStationOrderList(List<BusArriveInfoDto> busArriveInfoDtoList) {
-        List<Integer> busLocatedStationOrderList = new ArrayList<>();
-
-        busLocatedStationOrderList.add(busArriveInfoDtoList.get(0).getSecondArrivalStationOrder());
-        busLocatedStationOrderList.add(busArriveInfoDtoList.get(0).getFirstArrivalStationOrder());
-
-        for (int i = 1; i < busArriveInfoDtoList.size(); i++) {
-            BusArriveInfoDto curBusStation = busArriveInfoDtoList.get(i);
-
-            int firstArrivalStationOrder = curBusStation.getFirstArrivalStationOrder();
-            int secondArrivalStationOrder = curBusStation.getSecondArrivalStationOrder();
-
-            if (firstArrivalStationOrder == curBusStation.getStationOrder()) {
-                busLocatedStationOrderList.add(firstArrivalStationOrder);
-                if (secondArrivalStationOrder == curBusStation.getStationOrder()) {
-                    busLocatedStationOrderList.add(secondArrivalStationOrder);
-                }
+        for (BusPosition busPosition : busPositionList) {
+            BusPositionLog cachedbusPositionLog = busPositionLogMap.getOrDefault(busPosition.getLicensePlate(), null);
+            if (cachedbusPositionLog != null &&
+                    cachedbusPositionLog.getSectionOrder() < 55 &&
+                    cachedbusPositionLog.getSectionOrder().equals(busPosition.getSectionOrder())) {
+                log.info("이슈 발견");
+                busPosition.setHasIssue(true);
             }
         }
 
-        return busLocatedStationOrderList;
-    }
-
-
-    @Transactional
-    public void checkTrafficErrorByBusMovement(List<BusArriveInfoDto> busArriveInfoDtoList) {
-//        Map<String, BusPositionDto> busRealTimeLocationDtoMap = parseMapFromDto(busArriveInfoDtoList);
-//
-//        for (String licensePlate : busRealTimeLocationDtoMap.keySet()) {
-//            BusPositionDto busPositionDto = busRealTimeLocationDtoMap.get(licensePlate);
-//            busRealTimeLocateLogRepository.save(busPositionDto.toLogEntity("7016"));
-//            busRealTimeLocateRepository.findByLicensePlate(licensePlate).ifPresentOrElse(
-//                    busRealTimeLocateInfo -> {
-//                        if (busRealTimeLocateInfo.getStationOrder() == busPositionDto.getStationOrder()) {
-//                            List<Waypoint> busStation = busStationRepository.findAllByLocalStationId(busPositionDto.getStationId());
-//
-//                            if (!busStation.isEmpty()) {
-//                                accidentRepository.save(busPositionDto.toAccidentEntity(busStation.get(0)));
-//                            }
-//                        } else {
-//                            busRealTimeLocateInfo.setStationId(busPositionDto.getStationId());
-//                            busRealTimeLocateInfo.setStationOrder(busPositionDto.getStationOrder());
-//                        }
-//                    },
-//                    () -> busRealTimeLocateRepository.save(busPositionDto.toInfoEntity("7016"))
-//            );
-//        }
-//
-//        busRealTimeLocateRepository.deleteAllOutOfBoundBusInfo(busRealTimeLocationDtoMap.keySet());
-
-    }
-
-    private Map<String, BusPositionDto> parseMapFromDto(List<BusArriveInfoDto> busArriveInfoDtoList) {
-        Map<String, BusPositionDto> busRealTimeLocationDtoMap = new HashMap<>();
-        for (BusArriveInfoDto busArriveInfoDto : busArriveInfoDtoList) {
-
-            String firstArrivalLicensePlate = busArriveInfoDto.getFirstArrivalLicensePlate();
-            String secondArrivalLicensePlate = busArriveInfoDto.getSecondArrivalLicensePlate();
-
-
-            busRealTimeLocationDtoMap.putIfAbsent(
-                    firstArrivalLicensePlate,
-                    BusPositionDto.builder()
-                            .licensePlate(firstArrivalLicensePlate)
-                            .stationOrder(busArriveInfoDto.getFirstArrivalStationOrder())
-                            .stationId(busArriveInfoDto.getFirstArrivalNextStationId())
-                            .build());
-
-            busRealTimeLocationDtoMap.putIfAbsent(
-                    secondArrivalLicensePlate,
-                    BusPositionDto.builder()
-                            .licensePlate(secondArrivalLicensePlate)
-                            .stationOrder(busArriveInfoDto.getSecondArrivalStationOrder())
-                            .stationId(busArriveInfoDto.getSecondArrivalNextStationId())
-                            .build());
-        }
-
-        return busRealTimeLocationDtoMap;
+        busPositionLogRedisRepository.deleteAll();
+        busPositionLogRedisRepository.saveAll(BusPositionLog.convertBusPositionList(busPositionList));
     }
 
     @Transactional
     public List<BusPosition> getBusPositionList() {
-        return (List<BusPosition>) busPositionRepository.findAll();
+        return (List<BusPosition>) busPositionRedisRepository.findAll();
     }
 
     public List<TestBusPositionDto> getTestBusPosition() {
@@ -243,5 +67,22 @@ public class BusPositionService {
         busPositions.add(new TestBusPositionDto("서울70사7773", "126.972338", "37.541974", false, null));
 
         return busPositions;
+    }
+
+    public List<BusArriveInfoDto> getBusArriveInfo() {
+        //캐싱
+        List<BusStationInfo> busStationInfoList = busStationInfoRepository.findByBusName("7016");
+        Iterable<BusArriveInfo> busArriveInfoList = busArriveInfoRedisRepository.findAll();
+
+        Map<String, BusStationInfo> busStationInfoMap = busStationInfoList.stream()
+                .collect(Collectors.toMap(BusStationInfo::getStationId, busStationInfo -> busStationInfo));
+
+        List<BusArriveInfoDto> busArriveInfoDtoList = new ArrayList<>();
+        for (BusArriveInfo busArriveInfo : busArriveInfoList) {
+            BusStationInfo busStationInfo = busStationInfoMap.get(busArriveInfo.getStationId());
+            busArriveInfoDtoList.add(BusArriveInfoDto.generateDto(busArriveInfo, busStationInfo));
+        }
+
+        return busArriveInfoDtoList;
     }
 }
