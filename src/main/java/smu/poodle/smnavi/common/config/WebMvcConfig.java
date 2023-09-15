@@ -12,6 +12,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000", "https://main.d3pkk4juq39oze.amplifyapp.com")
                 .allowedHeaders("*")
                 .allowCredentials(true)
-                .allowedMethods("GET","POST","PUT","DELETE");
+                .allowedMethods("HEAD", "GET","POST","PUT","DELETE","OPTIONS");
     }
 }
