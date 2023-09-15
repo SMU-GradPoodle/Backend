@@ -22,11 +22,13 @@ import java.util.Optional;
 public class TipOffController {
     private final TipOffService tipOffService;
 
-    @PostMapping("/api/info") //글 작성
-    public ResponseEntity<Object> addInfo(@RequestBody @Valid TipOffRequestDto tipOffRequestDto) {
-        tipOffService.addInfo(tipOffRequestDto);
+    /**
+     * 제보글 작성
+     */
+    @PostMapping("/api/info")
+    public BaseResponse<TipOffResponseDto.Simple> registerTipOff(@RequestBody @Valid TipOffRequestDto tipOffRequestDto) {
 
-        return ResponseEntity.ok().build();
+        return BaseResponse.ok(tipOffService.registerTipOff(tipOffRequestDto));
     }
 
     @GetMapping("/api/info") //제보 전체 조회
@@ -34,19 +36,31 @@ public class TipOffController {
                                                                             Pageable pageable) {
         return BaseResponse.ok(tipOffService.getTipOffList(keyword, pageable));
     }
+
+
+    /**
+     * 제보글 단건 조회
+     */
     @GetMapping("/api/info/{id}") //제보 id별로 조회
-    public BaseResponse<TipOffResponseDto.Detail>getTipOffById(@PathVariable(value = "id") Long id) {
+    public BaseResponse<TipOffResponseDto.Detail> getTipOffById(@PathVariable(value = "id") Long id) {
         TipOffResponseDto.Detail infoDtoId = tipOffService.getTipOffById(id);
         return BaseResponse.ok(infoDtoId);
     }
 
+    /**
+     * 제보 글 버튼 조회 API
+     */
     @GetMapping("/api/info/button")
     public ResponseEntity<?> buttons() {
         List<LocationDto> locationDto1 = tipOffService.getBusLocationList();
         return ResponseEntity.ok().body(locationDto1);
     }
 
-    @PutMapping("/api/info/{id}") //수정
+
+    /**
+     * 제보 글 수정
+     */
+    @PutMapping("/api/info/{id}")
     public ResponseEntity<?> updateInfo(@PathVariable(value = "id") Long id, @RequestBody TipOffRequestDto tipOffRequestDto) {
         TipOffResponseDto.Detail updateInfo = tipOffService.updateInfo(id, tipOffRequestDto);
         if (updateInfo != null) {

@@ -40,7 +40,7 @@ public class BusArriveInfoApi {
                 + "busRouteId=" + busRouteId;
     }
 
-    @Scheduled(cron = "0 0/1 6-20 * * *")
+//    @Scheduled(cron = "0 0/1 6-20 * * *")
     public void parseDtoFromXml() {
         Document xmlContent = XmlApiUtil.getRootTag(makeUrl(MonitoringBus.BUS_7016.getBusRouteId()));
         Element msgBody = (Element) xmlContent.getElementsByTagName("msgBody").item(0);

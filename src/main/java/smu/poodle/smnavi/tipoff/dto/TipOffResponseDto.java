@@ -13,6 +13,19 @@ public class TipOffResponseDto {
     @Getter
     @Builder
     @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class Simple {
+        Long id;
+
+        public static Simple of(TipOff tipOff) {
+            return Simple.builder()
+                    .id(tipOff.getId())
+                    .build();
+        }
+    }
+
+    @Getter
+    @Builder
+    @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Detail {
         Long id;
         String nickname;
