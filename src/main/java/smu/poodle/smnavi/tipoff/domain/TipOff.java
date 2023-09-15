@@ -44,5 +44,4 @@ public class TipOff extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "tipOff", cascade = CascadeType.REMOVE)
     List<Thumb> thumbList = new ArrayList<>();
-
 }
