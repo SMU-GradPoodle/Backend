@@ -13,6 +13,7 @@ import smu.poodle.smnavi.map.service.PathService;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class PathController {
 
@@ -21,7 +22,7 @@ public class PathController {
     /**
      * startStationId 를 통해 경로를 불러오는 api
      */
-    @GetMapping("/api/route/{startPlaceId}")
+    @GetMapping("/route/{startPlaceId}")
     public ResponseEntity<BaseResponse> getRoute(@PathVariable Long startPlaceId) {
 
         List<PathDto.Info> transitRoute = pathService.getPathByStartPlace(startPlaceId);
@@ -41,9 +42,14 @@ public class PathController {
      *
      * @return 루트 DTO 리스트
      */
-    @GetMapping("/api/route")
+    @GetMapping("/route")
     public ResponseEntity<List<AbstractWaypointDto>> getRouteList() {
         return new ResponseEntity<>(pathService.getRouteList(), HttpStatus.OK);
+    }
+
+    @GetMapping("/bus-info/route/7016")
+    public smu.poodle.smnavi.common.dto.BaseResponse<PathDto.Info> get7016Route() {
+        return smu.poodle.smnavi.common.dto.BaseResponse.ok(pathService.get7016Route());
     }
 }
 

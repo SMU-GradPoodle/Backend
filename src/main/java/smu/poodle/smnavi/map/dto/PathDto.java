@@ -32,7 +32,7 @@ public class PathDto {
         @JsonIgnore
         String mapObj;
 
-        public static Info fromEntity(FullPath fullPath){
+        public static Info fromEntity(FullPath fullPath) {
             List<SubPath> subPaths = fullPath.getSubPaths().stream()
                     .map(FullPathAndSubPath::getSubPath).toList();
 
@@ -42,7 +42,7 @@ public class PathDto {
             for (SubPath subPath : subPaths) {
                 // 요구사항에 의해 walk 시간이 0이면 반환하지 않도록 처리
                 // 만약 요구사항이 변경되어도 DB 에는 저장되기 때문에 DTO 변환만 건들면 됨
-                if(subPath.getTransitType() == TransitType.WALK && subPath.getSectionTime() == 0){
+                if (subPath.getTransitType() == TransitType.WALK && subPath.getSectionTime() == 0) {
                     continue;
                 }
 
@@ -51,7 +51,7 @@ public class PathDto {
                 //변환된 정보를 subPathDto 로 담아 생성함
                 List<Edge> edges = subPath.getEdgeInfos().stream().map(SubPathAndEdge::getEdge).toList();
 
-                subPathDtos.add(PathDto.SubPathDto.makeSubPathDtoWithEdges(subPath, edges, accidents));
+                subPathDtos.add(PathDto.SubPathDto.makeSubPathDtoWithEdges(subPath, edges));
             }
 
             return Info.builder()
@@ -82,11 +82,11 @@ public class PathDto {
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         List<DetailPositionDto> gpsDetail;
 
-        public static SubPathDto makeSubPathDtoWithEdges(SubPath subPath, List<Edge> edges, List<AccidentDto.Info> accidents){
+        public static SubPathDto makeSubPathDtoWithEdges(SubPath subPath, List<Edge> edges) {
             SubPathDto subPathDto = SubPathDto.builder()
                     .transitType(subPath.getTransitType())
                     .sectionTime(subPath.getSectionTime())
-                    .stationList(AbstractWaypointDto.edgesToWaypointDtos(edges, accidents))
+                    .stationList(AbstractWaypointDto.edgesToWaypointDtos(edges))
                     .from(subPath.getToName())
                     .to(subPath.getToName())
                     .gpsDetail(DetailPositionDto.edgesToDetailPositionDtos(edges))
@@ -95,7 +95,7 @@ public class PathDto {
                     .to(subPath.getToName())
                     .build();
 
-            if(subPath.getTransitType() == TransitType.BUS) {
+            if (subPath.getTransitType() == TransitType.BUS) {
                 subPathDto.setBusType(subPath.getBusType().getTypeName());
             }
 

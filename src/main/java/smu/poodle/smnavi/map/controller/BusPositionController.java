@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import smu.poodle.smnavi.common.dto.BaseResponse;
 import smu.poodle.smnavi.map.dto.BusArriveInfoDto;
-import smu.poodle.smnavi.map.dto.TestBusPositionDto;
 import smu.poodle.smnavi.map.externapi.redis.domain.BusPosition;
 import smu.poodle.smnavi.map.service.BusPositionService;
 

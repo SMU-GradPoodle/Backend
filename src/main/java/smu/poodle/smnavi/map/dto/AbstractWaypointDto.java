@@ -19,12 +19,11 @@ public abstract class AbstractWaypointDto {
     String gpsY;
 
     public abstract Waypoint toEntity();
-    public static List<AbstractWaypointDto> edgesToWaypointDtos(List<Edge> edges, List<AccidentDto.Info> accidents) {
+    public static List<AbstractWaypointDto> edgesToWaypointDtos(List<Edge> edges) {
         List<AbstractWaypointDto> waypointDtos = new ArrayList<>();
 
         for (Edge edge : edges) {
             Waypoint waypoint = edge.getSrc();
-            accidents.addAll(waypoint.getAccidents().stream().map(AccidentDto.Info::of).toList());
             waypointDtos.add(waypoint.toDto());
         }
         waypointDtos.add(edges.get(edges.size()-1).getDst().toDto());

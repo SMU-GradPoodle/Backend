@@ -3,6 +3,7 @@ package smu.poodle.smnavi.map.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.path.FullPath;
 import smu.poodle.smnavi.map.domain.station.Place;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
@@ -48,5 +49,17 @@ public class PathService {
         FullPath fullPath = transitRepository.findRouteById(id);
 
         fullPath.updateIsSeen();
+    }
+
+    public PathDto.Info get7016Route() {
+
+        FullPath fullPath = fullPathRepository.findFullPathById(16L);
+
+        PathDto.Info pathDto = PathDto.Info.fromEntity(fullPath);
+
+        List<PathDto.SubPathDto> subPathList = pathDto.getSubPathList();
+        subPathList.removeIf(subPathDto -> subPathDto.getTransitType().equals(TransitType.WALK));
+
+        return pathDto;
     }
 }
