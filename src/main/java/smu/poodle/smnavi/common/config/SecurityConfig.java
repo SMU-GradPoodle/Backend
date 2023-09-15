@@ -4,6 +4,7 @@ package smu.poodle.smnavi.common.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,7 +43,13 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests((authorizeRequest) ->
                         authorizeRequest
-                                .anyRequest().permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                                .requestMatchers(HttpMethod.PUT, "/**").permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/**").permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                                .permitAll()
                 )
 
                 .formLogin(AbstractHttpConfigurer::disable)

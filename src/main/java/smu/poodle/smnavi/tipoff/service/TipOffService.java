@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import smu.poodle.smnavi.common.dto.PageResult;
 import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
@@ -34,7 +35,7 @@ public class TipOffService {
     private final SubwayStationRepository subwayStationRepository;
     private final ThumbService thumbService;
 
-
+    @Transactional
     public TipOffResponseDto.Simple registerTipOff(TipOffRequestDto tipOffRequestDto) {
 
         TipOff tipOff = tipOffRequestDto.ToEntity(loginService.getLoginMemberId());
@@ -50,11 +51,13 @@ public class TipOffService {
         return TipOffResponseDto.Simple.of(tipOffRepository.save(tipOff));
     }
 
+    @Transactional
     public TipOffResponseDto.Detail updateInfo(Long id, TipOffRequestDto tipOffRequestDto) {
         TipOff tipOff = tipOffRepository.findById(id)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
         tipOff.setContent(tipOffRequestDto.getContent());
+
         tipOffRepository.save(tipOff);
         return TipOffResponseDto.Detail.of(tipOff, thumbService.getLikeInfo(tipOff.getId()));
     }
@@ -68,17 +71,15 @@ public class TipOffService {
                 thumbService.getLikeInfo(tipOff.getId())))));
     }
 
+    @Transactional(readOnly = true)
     public TipOffResponseDto.Detail getTipOffById(Long id) {
-        Optional<TipOff> tipOff = tipOffRepository.findById(id);
-        if (tipOff.isPresent()) {
-            TipOff tipOff1 = tipOff.get();
-            LikeInfoDto likeInfoDto = thumbService.getLikeInfo(tipOff1.getId());
-            return TipOffResponseDto.Detail.of(tipOff1, likeInfoDto);
-        }
-        return null;
+        TipOff tipOff = tipOffRepository.findById(id).orElseThrow(() ->
+                new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
+        LikeInfoDto likeInfoDto = thumbService.getLikeInfo(tipOff.getId());
+        return TipOffResponseDto.Detail.of(tipOff, likeInfoDto);
     }
 
-
+    @Transactional
     public void deleteTipOff(Long id) {
         TipOff tipOff = tipOffRepository.findById(id).orElseThrow(() ->
                 new RestApiException(DetailErrorCode.NOT_CERTIFICATED)
