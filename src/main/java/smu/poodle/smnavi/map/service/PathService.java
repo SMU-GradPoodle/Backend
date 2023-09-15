@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import smu.poodle.smnavi.map.domain.data.TransitType;
+import smu.poodle.smnavi.map.domain.mapping.FullPathAndSubPath;
+import smu.poodle.smnavi.map.domain.mapping.SubPathAndEdge;
 import smu.poodle.smnavi.map.domain.path.FullPath;
 import smu.poodle.smnavi.map.domain.station.Place;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
@@ -11,6 +13,7 @@ import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.dto.RouteDto;
 import smu.poodle.smnavi.map.dto.WaypointDto;
+import smu.poodle.smnavi.map.externapi.GpsPoint;
 import smu.poodle.smnavi.map.repository.*;
 
 import java.util.ArrayList;
@@ -51,15 +54,23 @@ public class PathService {
         fullPath.updateIsSeen();
     }
 
-    public PathDto.Info get7016Route() {
+    public List<GpsPoint> get7016Route() {
 
         FullPath fullPath = fullPathRepository.findFullPathById(16L);
 
-        PathDto.Info pathDto = PathDto.Info.fromEntity(fullPath);
+        List<GpsPoint> gpsPointList = new ArrayList<>();
 
-        List<PathDto.SubPathDto> subPathList = pathDto.getSubPathList();
-        subPathList.removeIf(subPathDto -> subPathDto.getTransitType().equals(TransitType.WALK));
+        List<FullPathAndSubPath> subPaths = fullPath.getSubPaths();
 
-        return pathDto;
+        for (FullPathAndSubPath fullPathAndSubPath : subPaths) {
+            List<SubPathAndEdge> edgeInfos = fullPathAndSubPath.getSubPath().getEdgeInfos();
+            for (SubPathAndEdge edgeInfo : edgeInfos) {
+                gpsPointList.addAll(edgeInfo.getEdge().getDetailPositionList().stream().map((detailPosition -> {
+                    return new GpsPoint(detailPosition.getX(), detailPosition.getY());
+                })).collect(Collectors.toList()));
+            }
+        }
+
+        return gpsPointList;
     }
 }

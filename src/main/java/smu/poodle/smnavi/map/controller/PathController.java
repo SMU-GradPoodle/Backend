@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 import smu.poodle.smnavi.map.dto.PathDto;
+import smu.poodle.smnavi.map.externapi.GpsPoint;
 import smu.poodle.smnavi.map.response.BaseResponse;
 import smu.poodle.smnavi.map.response.TransitResponse;
 import smu.poodle.smnavi.map.service.PathService;
@@ -48,7 +49,7 @@ public class PathController {
     }
 
     @GetMapping("/bus-info/route/7016")
-    public smu.poodle.smnavi.common.dto.BaseResponse<PathDto.Info> get7016Route() {
+    public smu.poodle.smnavi.common.dto.BaseResponse<List<GpsPoint>> get7016Route() {
         return smu.poodle.smnavi.common.dto.BaseResponse.ok(pathService.get7016Route());
     }
 }
