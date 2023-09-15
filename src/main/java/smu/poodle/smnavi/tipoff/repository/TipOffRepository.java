@@ -19,4 +19,5 @@ public interface TipOffRepository extends JpaRepository<TipOff, Long> {
             "or t.content ilike concat('%', :query, '%') " +
             "order by t.createdAt desc ")
     Page<TipOff> findByQuery(@Param("query") String query, Pageable pageable);
+
 }

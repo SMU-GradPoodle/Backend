@@ -25,6 +25,8 @@ public class TipOff extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    Long pw;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     UserEntity author;

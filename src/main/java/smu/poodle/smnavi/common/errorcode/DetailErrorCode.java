@@ -14,6 +14,7 @@ public enum DetailErrorCode implements ErrorCode{
     NOT_CERTIFICATED(HttpStatus.UNAUTHORIZED, "인증을 진행해주세요"),
     INVALID_CERTIFICATION_KEY(HttpStatus.UNAUTHORIZED, "잘못된 인증번호입니다."),
     FAIL_TO_SEND_MAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패하였습니다."),
+    NOT_CORRECT_PASSWORD(HttpStatus.CONFLICT, "비밀번호가 다릅니다."),
     ;
 
 

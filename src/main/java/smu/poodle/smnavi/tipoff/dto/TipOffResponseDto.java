@@ -28,6 +28,7 @@ public class TipOffResponseDto {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Detail {
         Long id;
+        Long pw;
         String nickname;
         Kind kind;
         Transportation transportation;
@@ -38,6 +39,7 @@ public class TipOffResponseDto {
         public static Detail of(TipOff tipOff, LikeInfoDto likeInfoDto) {
             return Detail.builder()
                     .id(tipOff.getId())
+                    .pw(tipOff.getPw())
                     .nickname(tipOff.getAuthor() == null ? "익명이" : tipOff.getAuthor().getNickname())
                     .content(tipOff.getContent())
                     .transportation(Transportation.of(tipOff.getLocation()))

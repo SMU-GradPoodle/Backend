@@ -1,13 +1,17 @@
 package smu.poodle.smnavi.tipoff.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.ErrorResponseException;
 import smu.poodle.smnavi.common.dto.PageResult;
 import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
+import smu.poodle.smnavi.common.errorcode.ErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
@@ -24,6 +28,7 @@ import smu.poodle.smnavi.user.sevice.LoginService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,10 +41,14 @@ public class TipOffService {
     private final ThumbService thumbService;
 
     @Transactional
-    public TipOffResponseDto.Simple registerTipOff(TipOffRequestDto tipOffRequestDto) {
-
+    @Validated
+    public TipOffResponseDto.Simple registerTipOff(@Valid TipOffRequestDto tipOffRequestDto) {
         TipOff tipOff = tipOffRequestDto.ToEntity(loginService.getLoginMemberId());
-
+        if(!tipOffRequestDto.isPasswordRequired()){ //비밀번호를 필요로 하지 않으면
+            return null;
+        }else{
+            tipOff.setPw(tipOffRequestDto.getPw());
+        }
         if (tipOff.getTransitType() == TransitType.BUS) {
             Waypoint waypoint = busStationRepository.findAllByLocalStationId(tipOffRequestDto.getStationId()).get(0);
             tipOff.setWaypoint(waypoint);
@@ -47,7 +56,6 @@ public class TipOffService {
             Waypoint waypoint = subwayStationRepository.findAllByStationId(Integer.parseInt(tipOffRequestDto.getStationId())).get(0);
             tipOff.setWaypoint(waypoint);
         }
-
         return TipOffResponseDto.Simple.of(tipOffRepository.save(tipOff));
     }
 
@@ -55,13 +63,32 @@ public class TipOffService {
     public TipOffResponseDto.Detail updateInfo(Long id, TipOffRequestDto tipOffRequestDto) {
         TipOff tipOff = tipOffRepository.findById(id)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
-
-        tipOff.setContent(tipOffRequestDto.getContent());
-
-        tipOffRepository.save(tipOff);
+        if(tipOffRequestDto.isPasswordRequired()){ //익명 사용자라면
+            if(Objects.equals(tipOffRequestDto.getPw(), tipOff.getPw())){ //비밀번호가 같으면
+                tipOff.setContent(tipOffRequestDto.getContent());
+                tipOffRepository.save(tipOff);
+            }else{
+                throw new RestApiException(DetailErrorCode.NOT_CORRECT_PASSWORD);
+            }
+        }else{ //로그인한 사용자라면
+            tipOff.setContent(tipOffRequestDto.getContent());
+            tipOffRepository.save(tipOff);
+        }
         return TipOffResponseDto.Detail.of(tipOff, thumbService.getLikeInfo(tipOff.getId()));
     }
-
+    @Transactional
+    public void deleteTipOff(Long id, TipOffRequestDto tipOffRequestDto) {
+        TipOff tipOff = tipOffRepository.findById(id).orElseThrow(() ->
+                new RestApiException(DetailErrorCode.NOT_CERTIFICATED)
+        );
+        if(tipOffRequestDto.isPasswordRequired()){
+            if(Objects.equals(tipOffRequestDto.getPw(), tipOff.getPw())){
+                tipOffRepository.delete(tipOff);
+            }
+        }else{
+            throw new RestApiException(DetailErrorCode.NOT_CORRECT_PASSWORD);
+        }
+    }
 
     //todo : 제목 검색이 의미가 있는가?
     public PageResult<TipOffResponseDto.Detail> getTipOffList(String keyword, Pageable pageable) {
@@ -79,14 +106,6 @@ public class TipOffService {
         return TipOffResponseDto.Detail.of(tipOff, likeInfoDto);
     }
 
-    @Transactional
-    public void deleteTipOff(Long id) {
-        TipOff tipOff = tipOffRepository.findById(id).orElseThrow(() ->
-                new RestApiException(DetailErrorCode.NOT_CERTIFICATED)
-        );
-
-        tipOffRepository.delete(tipOff);
-    }
 
     public List<LocationDto> getTipOffButton() {
         List<Location> busTransitType = Location.getByTransitType(TransitType.BUS);
