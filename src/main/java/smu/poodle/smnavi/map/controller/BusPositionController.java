@@ -25,12 +25,17 @@ public class BusPositionController {
     }
 
     @GetMapping("/test/bus-position")
-    public BaseResponse<List<TestBusPositionDto>> getTestBusPosition() {
+    public BaseResponse<List<BusPosition>> getTestBusPosition() {
         return BaseResponse.ok(busPositionService.getTestBusPosition());
     }
 
     @GetMapping("/bus-station-info")
     public BaseResponse<List<BusArriveInfoDto>> getBusArriveInfo() {
         return BaseResponse.ok(busPositionService.getBusArriveInfo());
+    }
+
+    @GetMapping("/test/bus-station-info")
+    public BaseResponse<List<BusArriveInfoDto>> getBusArriveInfoTest() {
+        return BaseResponse.ok(busPositionService.getBusArriveInfoTest());
     }
 }

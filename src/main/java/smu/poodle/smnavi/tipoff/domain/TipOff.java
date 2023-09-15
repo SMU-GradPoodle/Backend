@@ -42,7 +42,7 @@ public class TipOff extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     TransitType transitType;
 
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "tipOff", cascade = CascadeType.REMOVE)
     List<Thumb> thumbList = new ArrayList<>();
 
 }
