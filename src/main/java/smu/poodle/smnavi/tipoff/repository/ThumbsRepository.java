@@ -9,12 +9,7 @@ import smu.poodle.smnavi.tipoff.domain.Thumb;
 import java.util.Optional;
 
 @Repository
-public interface ThumbsRepository extends JpaRepository<Thumb,Integer> { //<엔티티클래스, pk타입>
-    @Query("select t from Thumb as t")
-    Optional<Thumb> findByUserAndBoard_Id(Long userId, long boardId);
-
-    @Query("select count(t) from Thumb as t")
-    int countByBoard_IdAndIdentify(Long board_id, int identify);
+public interface ThumbsRepository extends JpaRepository<Thumb, Integer> {
 
     Optional<Thumb> findByUserIdAndTipOffId(Long userId, Long tipOffId);
 

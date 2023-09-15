@@ -28,12 +28,6 @@ public class LocationDto {
         }
     }
     public static LocationDto from(String transitType, List<Location> locations) {
-//        return LocationDto.builder()
-//                .transitType(transitType)
-//                .locationInfos(locations.stream().map((location) -> {
-//                    return LocationInfoDto.of(location);
-//                }).toList())
-//                .build();
         return LocationDto.builder()
                 .transitType(transitType)
                 .locationInfos(locations.stream().map(LocationInfoDto::of).toList())

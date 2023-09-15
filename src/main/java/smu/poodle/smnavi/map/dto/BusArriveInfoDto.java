@@ -1,6 +1,7 @@
 package smu.poodle.smnavi.map.dto;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -10,6 +11,7 @@ import smu.poodle.smnavi.map.externapi.redis.domain.BusArriveInfo;
 
 @Getter
 @Builder
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BusArriveInfoDto {
     String stationId;

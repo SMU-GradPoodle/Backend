@@ -8,6 +8,9 @@ import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.user.domain.UserEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -33,15 +36,12 @@ public class TipOff extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     Location location;
 
-    Integer increaseCount;
-
     @ManyToOne(fetch = FetchType.LAZY)
     Waypoint waypoint;
 
     @Enumerated(EnumType.STRING)
     TransitType transitType;
 
-    public void increaseViews() {
-        this.increaseCount++;
-    }
+    @OneToMany(mappedBy = "tipOff", cascade = CascadeType.REMOVE)
+    List<Thumb> thumbList = new ArrayList<>();
 }

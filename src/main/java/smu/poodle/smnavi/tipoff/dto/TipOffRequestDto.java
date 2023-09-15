@@ -33,7 +33,6 @@ public class TipOffRequestDto {
                 .transitType(TransitType.valueOf(transitType))
                 .kind(Kind.getKindByNumber(this.kind))
                 .location(Location.stationIdToLocation(stationId))
-                .increaseCount(0)
                 .build();
     }
 }

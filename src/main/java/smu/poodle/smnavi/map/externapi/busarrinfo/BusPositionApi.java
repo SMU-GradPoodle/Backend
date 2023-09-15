@@ -41,7 +41,7 @@ public class BusPositionApi {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0/1 9-23 * * *")
+    @Scheduled(cron = "0 0/1 6-20 * * *")
     public void cachingBusPosition() {
         log.info(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.SSS")) + " 버스 교통 이슈 확인 시작 시간");
 

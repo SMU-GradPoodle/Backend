@@ -23,14 +23,6 @@ public class TransitRepository {
 
     }
 
-    public List<FullPath> findAllRouteSeenTrue() {
-        return em.createQuery("select r " +
-                        "from FullPath as r " +
-                        "join fetch r.startWaypoint " +
-                        "where r.isSeen = TRUE", FullPath.class)
-                .getResultList();
-    }
-
     public FullPath findRouteById(Long routeId) {
         return em.createQuery("select r " +
                         "from FullPath as r " +
