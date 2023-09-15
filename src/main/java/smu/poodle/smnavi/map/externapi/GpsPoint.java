@@ -10,7 +10,7 @@ import lombok.ToString;
 @Getter
 @ToString
 public class GpsPoint {
-    private final String gpsX;
-    private final String gpsY;
+    private String gpsX;
+    private String gpsY;
 
 }

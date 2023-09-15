@@ -13,5 +13,7 @@ public interface FullPathRepository extends JpaRepository<FullPath, Long> {
 
     @Query("select f from FullPath as f where f.startWaypoint.id = :startPlaceId")
     List<FullPath> findByStartPlaceId(@Param("startPlaceId") Long startPlaceId);
+
+    FullPath findFullPathById(Long id);
 }
 

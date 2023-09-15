@@ -13,6 +13,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     @Query("select distinct p from Place as p " +
             "right join FullPath as f on p = f.startWaypoint " +
+            "where f.isSeen = true " +
             "order by p.placeName")
     List<Waypoint> findAllStartPlace();
 }
