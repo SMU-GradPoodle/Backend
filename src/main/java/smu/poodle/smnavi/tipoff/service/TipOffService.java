@@ -57,9 +57,7 @@ public class TipOffService {
         TipOff tipOff = tipOffRepository.findById(id)
                 .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
-        if (tipOff.getAuthor() == null && !tipOffRequestDto.getPassword().equals(tipOff.getPassword())) {
-            throw new RestApiException(DetailErrorCode.NOT_CORRECT_PASSWORD);
-        }
+        authorizationTipOff(tipOff, tipOffRequestDto.getPassword());
 
         tipOff.setContent(tipOffRequestDto.getContent());
 
