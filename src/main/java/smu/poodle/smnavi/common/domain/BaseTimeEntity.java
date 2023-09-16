@@ -36,8 +36,8 @@ public abstract class BaseTimeEntity {
         return ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 
-    public String getCreatedDateToString() {
-        return createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    public String getCreatedDateTimeToString() {
+        return createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     public String getCreatedTimeToString() {

@@ -3,6 +3,8 @@ package smu.poodle.smnavi.tipoff.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import smu.poodle.smnavi.common.dto.BaseResponse;
@@ -31,7 +33,7 @@ public class TipOffController {
     @GetMapping("/api/info") //제보 전체 조회
     public BaseResponse<PageResult<TipOffResponseDto.Detail>> getTipOffList(
             @RequestParam(required = false) String keyword,
-            Pageable pageable) {
+            @PageableDefault(size = 7, sort = "createdAt", direction = Sort.Direction.DESC)  Pageable pageable) {
         return BaseResponse.ok(tipOffService.getTipOffList(keyword, pageable));
     }
 
@@ -59,21 +61,16 @@ public class TipOffController {
      * 제보 글 수정
      */
     @PutMapping("/api/info/{id}")
-    public ResponseEntity<?> updateInfo(@PathVariable(value = "id") Long id, @RequestBody TipOffRequestDto tipOffRequestDto) {
-        TipOffResponseDto.Detail updateInfo = tipOffService.updateInfo(id, tipOffRequestDto);
-        if (updateInfo != null) {
-            return ResponseEntity.ok().body(tipOffRequestDto);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public BaseResponse<TipOffResponseDto.Simple> updateInfo(@PathVariable(value = "id") Long id, @RequestBody TipOffRequestDto tipOffRequestDto) {
+        return BaseResponse.ok(tipOffService.updateInfo(id, tipOffRequestDto));
     }
 
     /**
      * 제보글 삭제
      */
     @DeleteMapping("/api/info/{id}")
-    public BaseResponse<Void> deleteTipOff(@PathVariable(value = "id") Long id) {
-        tipOffService.deleteTipOff(id);
+    public BaseResponse<Void> deleteTipOff(@PathVariable(value = "id") Long id, @RequestBody TipOffRequestDto tipOffRequestDto) {
+        tipOffService.deleteTipOff(id, tipOffRequestDto);
         return BaseResponse.ok();
     }
 }

@@ -12,6 +12,6 @@ import smu.poodle.smnavi.common.exception.RestApiException;
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) {
-        throw new RestApiException(CommonErrorCode.NO_AUTHORIZE);
+        throw new RestApiException(CommonErrorCode.FORBIDDEN);
     }
 }

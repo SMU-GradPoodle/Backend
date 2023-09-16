@@ -32,10 +32,13 @@ public class TipOffResponseDto {
         Kind kind;
         Transportation transportation;
         String content;
+        String createdAt;
         String createdTime;
         LikeInfoDto likeInfo;
+        Boolean isAnonymous;
+        Boolean isMine;
 
-        public static Detail of(TipOff tipOff, LikeInfoDto likeInfoDto) {
+        public static Detail of(TipOff tipOff, LikeInfoDto likeInfoDto, Long loginUserId) {
             return Detail.builder()
                     .id(tipOff.getId())
                     .nickname(tipOff.getAuthor() == null ? "익명이" : tipOff.getAuthor().getNickname())
@@ -43,7 +46,10 @@ public class TipOffResponseDto {
                     .transportation(Transportation.of(tipOff.getLocation()))
                     .kind(Kind.of(tipOff.getKind()))
                     .createdTime(tipOff.getFormattedCreatedAt())
+                    .createdAt(tipOff.getCreatedDateTimeToString())
                     .likeInfo(likeInfoDto)
+                    .isAnonymous(tipOff.getAuthor() == null)
+                    .isMine(tipOff.getAuthor() != null && tipOff.getAuthor().getId().equals(loginUserId))
                     .build();
         }
     }
