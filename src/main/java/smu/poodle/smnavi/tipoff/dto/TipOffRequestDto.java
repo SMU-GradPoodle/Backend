@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.util.StringUtils;
 import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.tipoff.domain.Location;
@@ -35,7 +36,7 @@ public class TipOffRequestDto {
     String content;
 
     public TipOff ToEntity(Long loginUserId) {
-        if (loginUserId == 0 && password.isBlank()) {
+        if (loginUserId == 0 && !StringUtils.hasText(password)) {
             throw new RestApiException(DetailErrorCode.PASSWORD_REQUIRED);
         }
         return TipOff.builder()
