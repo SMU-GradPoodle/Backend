@@ -69,7 +69,7 @@ public class TipOffController {
      * 제보글 삭제
      */
     @DeleteMapping("/api/info/{id}")
-    public BaseResponse<Void> deleteTipOff(@PathVariable(value = "id") Long id, TipOffRequestDto tipOffRequestDto) {
+    public BaseResponse<Void> deleteTipOff(@PathVariable(value = "id") Long id, @RequestBody TipOffRequestDto tipOffRequestDto) {
         tipOffService.deleteTipOff(id, tipOffRequestDto);
         return BaseResponse.ok();
     }

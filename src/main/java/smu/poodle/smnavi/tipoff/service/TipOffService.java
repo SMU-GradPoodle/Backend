@@ -104,7 +104,7 @@ public class TipOffService {
     }
 
     private void authorizationTipOff(TipOff tipOff, String password) {
-        if (tipOff.getAuthor() == null && !password.equals(tipOff.getPassword())) {
+        if (tipOff.getAuthor() == null && !Objects.equals(password, tipOff.getPassword())) {
             throw new RestApiException(DetailErrorCode.NOT_CORRECT_PASSWORD);
         }
 
