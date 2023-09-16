@@ -24,7 +24,7 @@ import smu.poodle.smnavi.user.sevice.LoginService;
 public class TipOffRequestDto {
     LoginService loginService;
     String transitType;
-    int kind;
+    Integer kind;
     String stationId;
 
     String author;
