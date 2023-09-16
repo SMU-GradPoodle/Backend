@@ -107,7 +107,7 @@ public class AuthService implements UserDetailsService {
         Cookie cookie = new Cookie(TokenType.REFRESH_TOKEN.getHeader(), cookieValue);
         cookie.setPath("/");
 //        cookie.setHttpOnly(true);
-        cookie.setMaxAge((int) refreshTokenDto.getExpiresAt());
+        cookie.setMaxAge((int) refreshTokenDto.getExpiresAt() / 1000);
         response.addCookie(cookie);
     }
 
