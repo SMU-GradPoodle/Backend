@@ -3,6 +3,10 @@ package smu.poodle.smnavi.tipoff.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
+import smu.poodle.smnavi.common.errorcode.ErrorCode;
+import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.tipoff.domain.Thumb;
 import smu.poodle.smnavi.tipoff.domain.ThumbStatus;
 import smu.poodle.smnavi.tipoff.domain.TipOff;
@@ -22,6 +26,10 @@ public class ThumbService {
     @Transactional
     public LikeInfoDto doLikeOrHate(Long tipOffId, ThumbStatus thumbStatus) {
         Long userId = loginService.getLoginMemberId();
+
+        if(userId == 0) {
+            throw new RestApiException(CommonErrorCode.LOGIN_REQUIRED);
+        }
 
         thumbsRepository.findByUserIdAndTipOffId(userId, tipOffId)
                 .ifPresentOrElse((thumb -> {
