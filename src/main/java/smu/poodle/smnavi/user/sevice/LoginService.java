@@ -15,9 +15,5 @@ public class LoginService {
             return 0L;
         }
     }
-    public boolean isLogIn(){
-        return !SecurityContextHolder.getContext().getAuthentication().getName().isEmpty();
-        //비어있으면 return false -> 로그인 하지 않은 것
-    }
 }
 

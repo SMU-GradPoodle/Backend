@@ -28,24 +28,28 @@ public class TipOffResponseDto {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Detail {
         Long id;
-        Long pw;
         String nickname;
         Kind kind;
         Transportation transportation;
         String content;
+        String createdAt;
         String createdTime;
         LikeInfoDto likeInfo;
+        Boolean isAnonymous;
+        Boolean isMine;
 
-        public static Detail of(TipOff tipOff, LikeInfoDto likeInfoDto) {
+        public static Detail of(TipOff tipOff, LikeInfoDto likeInfoDto, Long loginUserId) {
             return Detail.builder()
                     .id(tipOff.getId())
-                    .pw(tipOff.getPw())
                     .nickname(tipOff.getAuthor() == null ? "익명이" : tipOff.getAuthor().getNickname())
                     .content(tipOff.getContent())
                     .transportation(Transportation.of(tipOff.getLocation()))
                     .kind(Kind.of(tipOff.getKind()))
                     .createdTime(tipOff.getFormattedCreatedAt())
+                    .createdAt(tipOff.getCreatedDateTimeToString())
                     .likeInfo(likeInfoDto)
+                    .isAnonymous(tipOff.getAuthor() == null)
+                    .isMine(tipOff.getAuthor() != null && tipOff.getAuthor().getId().equals(loginUserId))
                     .build();
         }
     }

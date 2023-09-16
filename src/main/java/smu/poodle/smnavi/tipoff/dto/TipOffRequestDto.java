@@ -1,13 +1,14 @@
 package smu.poodle.smnavi.tipoff.dto;
 
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.validator.constraints.Length;
+import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
+import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.tipoff.domain.Location;
 import smu.poodle.smnavi.tipoff.domain.TipOff;
 import smu.poodle.smnavi.map.domain.data.TransitType;
@@ -27,24 +28,24 @@ public class TipOffRequestDto {
 
     String author;
 
-    @Length(min = 4, max = 4, message = "비밀번호는 4자로 입력해주세요")
-    Long pw;
+    String password;
 
     @NotEmpty(message = "내용은 필수 입력 항목 입니다.")
     @Length(min = 1, max = 200, message = "내용은 10자 이상 5000자 이하로 입력해주세요.")
     String content;
 
     public TipOff ToEntity(Long loginUserId) {
+        if (loginUserId == 0 && password.isBlank()) {
+            throw new RestApiException(DetailErrorCode.PASSWORD_REQUIRED);
+        }
         return TipOff.builder()
                 .author(loginUserId != 0 ? UserEntity.builder().id(loginUserId).build() : null)
+                .password(password)
                 .content(content)
                 .transitType(TransitType.valueOf(transitType))
                 .kind(Kind.getKindByNumber(this.kind))
                 .location(Location.stationIdToLocation(stationId))
                 .build();
-    }
-    public boolean isPasswordRequired() { //로그인 한 경우
-        return !loginService.isLogIn(); //비밀번호 필요 없음면 flase
     }
 }
 
