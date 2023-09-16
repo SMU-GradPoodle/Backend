@@ -78,8 +78,8 @@ public class TipOffService {
     }
 
     //todo : 제목 검색이 의미가 있는가?
-    public PageResult<TipOffResponseDto.Detail> getTipOffList(String keyword, Pageable pageable) {
-        Page<TipOff> tipOffPage = tipOffRepository.findByQuery(keyword, pageable);
+    public PageResult<TipOffResponseDto.Detail> getTipOffList(Boolean isMine, Pageable pageable) {
+        Page<TipOff> tipOffPage = tipOffRepository.findByQuery(isMine, loginService.getLoginMemberId(), pageable);
 
         return PageResult.of(tipOffPage.map((tipOff -> TipOffResponseDto.Detail.of(tipOff,
                 thumbService.getLikeInfo(tipOff.getId()), loginService.getLoginMemberId()))));

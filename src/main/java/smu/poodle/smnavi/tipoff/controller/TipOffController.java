@@ -32,9 +32,9 @@ public class TipOffController {
      */
     @GetMapping("/api/info") //제보 전체 조회
     public BaseResponse<PageResult<TipOffResponseDto.Detail>> getTipOffList(
-            @RequestParam(required = false) String keyword,
+            @RequestParam Boolean isMine,
             @PageableDefault(size = 7, sort = "createdAt", direction = Sort.Direction.DESC)  Pageable pageable) {
-        return BaseResponse.ok(tipOffService.getTipOffList(keyword, pageable));
+        return BaseResponse.ok(tipOffService.getTipOffList(isMine, pageable));
     }
 
 

@@ -20,8 +20,7 @@ public interface TipOffRepository extends JpaRepository<TipOff, Long> {
     Optional<TipOff> findById(Long id);
 
     @Query("select t from TipOff as t " +
-            "where :query is null " +
-            "or t.content ilike concat('%', :query, '%')")
-    Page<TipOff> findByQuery(@Param("query") String query, Pageable pageable);
+            "where (:isMine = false or t.author.id = :loginUserId)")
+    Page<TipOff> findByQuery(@Param("isMine") Boolean isMine, @Param("loginUserId") Long loginUserId, Pageable pageable);
 
 }
