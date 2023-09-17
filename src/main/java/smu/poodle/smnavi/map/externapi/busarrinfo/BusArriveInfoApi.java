@@ -79,7 +79,7 @@ public class BusArriveInfoApi {
         busArriveInfoRedisRepository.saveAll(busArriveInfoList);
     }
 
-    @Scheduled(cron = "1 20 * * *")
+    @Scheduled(cron = "* 1 20 * * *")
     public void deleteBusArriveCache() {
         busArriveInfoRedisRepository.deleteAll();
     }
