@@ -2,6 +2,7 @@ package smu.poodle.smnavi.map.externapi.busarrinfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +29,11 @@ public class BusPositionApi {
     private final BusPositionRedisRepository busPositionRedisRepository;
     private final BusPositionService busPositionService;
 
+    @Value("${PUBLIC_DATA_API_KEY}")
+    private String SERVICE_KEY;
+
     private String getUrl(MonitoringBus monitoringBus) {
         final String URL = "http://ws.bus.go.kr/api/rest/buspos/getBusPosByRouteSt?ServiceKey=%s&busRouteId=%s&startOrd=%d&endOrd=%d";
-        final String SERVICE_KEY = "bFcIfbKjGI8rVFG9xZouBt%2B3s0kITpf0u6Loz8ekrvseXj%2Bye16tUmvGrBgLdK5zbVA3cAanmNPa%2F1o%2B2n2feQ%3D%3D";
 
         return String.format(
                 URL,

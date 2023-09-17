@@ -2,6 +2,7 @@ package smu.poodle.smnavi.map.externapi.busarrinfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -28,12 +29,12 @@ import java.util.regex.Pattern;
 public class BusArriveInfoApi {
 
     private final BusArriveInfoRedisRepository busArriveInfoRedisRepository;
+    @Value("${PUBLIC_DATA_API_KEY}")
+    private String SERVICE_KEY;
 
     private String makeUrl(String busRouteId) {
 
         final String API_BASE_URL = "http://ws.bus.go.kr/api/rest/arrive/getArrInfoByRouteAll";
-
-        final String SERVICE_KEY = "bFcIfbKjGI8rVFG9xZouBt%2B3s0kITpf0u6Loz8ekrvseXj%2Bye16tUmvGrBgLdK5zbVA3cAanmNPa%2F1o%2B2n2feQ%3D%3D";
 
         return API_BASE_URL + "?"
                 + "serviceKey=" + SERVICE_KEY + "&"
@@ -76,6 +77,11 @@ public class BusArriveInfoApi {
         log.info("정보 저장");
         busArriveInfoRedisRepository.deleteAll();
         busArriveInfoRedisRepository.saveAll(busArriveInfoList);
+    }
+
+    @Scheduled(cron = "1 20 * * *")
+    public void deleteBusArriveCache() {
+        busArriveInfoRedisRepository.deleteAll();
     }
 
     public int parseSecondsFromString(String arriveMessage) {

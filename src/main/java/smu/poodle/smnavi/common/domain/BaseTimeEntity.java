@@ -51,7 +51,7 @@ public abstract class BaseTimeEntity {
         if (duration.toMinutes() < 60) {
             long minutes = duration.toMinutes();
             return minutes + "분 전";
-        } else if (duration.toHours() < 12) {
+        } else if (duration.toHours() < 24) {
             long hours = duration.toHours();
             return hours + "시간 전";
         } else if (duration.toDays() < 5) {
