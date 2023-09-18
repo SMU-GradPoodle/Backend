@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import smu.poodle.smnavi.map.domain.station.BusStationInfo;
 import smu.poodle.smnavi.map.dto.BusArriveInfoDto;
-import smu.poodle.smnavi.map.externapi.redis.BusArriveInfoRedisRepository;
-import smu.poodle.smnavi.map.externapi.redis.BusPositionLogRedisRepository;
-import smu.poodle.smnavi.map.externapi.redis.BusPositionRedisRepository;
-import smu.poodle.smnavi.map.externapi.redis.domain.BusArriveInfo;
-import smu.poodle.smnavi.map.externapi.redis.domain.BusPosition;
-import smu.poodle.smnavi.map.externapi.redis.domain.BusPositionLog;
+import smu.poodle.smnavi.map.redis.repository.BusArriveInfoRedisRepository;
+import smu.poodle.smnavi.map.redis.repository.BusPositionLogRedisRepository;
+import smu.poodle.smnavi.map.redis.repository.BusPositionRedisRepository;
+import smu.poodle.smnavi.map.redis.hash.BusArriveInfo;
+import smu.poodle.smnavi.map.redis.hash.BusPosition;
+import smu.poodle.smnavi.map.redis.hash.BusPositionLog;
 import smu.poodle.smnavi.map.repository.BusStationInfoRepository;
 
 import java.util.ArrayList;
@@ -58,18 +58,23 @@ public class BusPositionService {
     }
 
     public List<BusArriveInfoDto> getBusArriveInfo() {
-        //캐싱
+        //todo : 캐싱
         List<BusStationInfo> busStationInfoList = busStationInfoRepository.findByBusName("7016");
-        Iterable<BusArriveInfo> busArriveInfoList = busArriveInfoRedisRepository.findAll();
+        List<BusArriveInfo> busArriveInfoList = busArriveInfoRedisRepository.findAll();
 
-        Map<String, BusStationInfo> busStationInfoMap = busStationInfoList.stream()
-                .collect(Collectors.toMap(BusStationInfo::getStationId, busStationInfo -> busStationInfo));
+        Map<String, BusArriveInfo> busArriveInfoMap = busArriveInfoList.stream()
+                .collect(Collectors.toMap(BusArriveInfo::getStationId, busArriveInfo -> busArriveInfo));
+
+//        Map<String, BusStationInfo> busStationInfoMap = busStationInfoList.stream()
+//                .collect(Collectors.toMap(BusStationInfo::getStationId, busStationInfo -> busStationInfo));
 
         List<BusArriveInfoDto> busArriveInfoDtoList = new ArrayList<>();
-        for (BusArriveInfo busArriveInfo : busArriveInfoList) {
-            BusStationInfo busStationInfo = busStationInfoMap.get(busArriveInfo.getStationId());
+
+        for (BusStationInfo busStationInfo : busStationInfoList) {
+            BusArriveInfo busArriveInfo = busArriveInfoMap.getOrDefault(busStationInfo.getStationId(),BusArriveInfo.getDefaultInstance());
             busArriveInfoDtoList.add(BusArriveInfoDto.generateDto(busArriveInfo, busStationInfo));
         }
+
 
         return busArriveInfoDtoList;
     }

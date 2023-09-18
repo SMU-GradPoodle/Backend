@@ -1,7 +1,7 @@
-package smu.poodle.smnavi.map.externapi.redis;
+package smu.poodle.smnavi.map.redis.repository;
 
 import org.springframework.data.repository.CrudRepository;
-import smu.poodle.smnavi.map.externapi.redis.domain.BusPosition;
+import smu.poodle.smnavi.map.redis.hash.BusPosition;
 
 public interface BusPositionRedisRepository extends CrudRepository<BusPosition, String> {
 }

@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.externapi;
+package smu.poodle.smnavi.map.callapi;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

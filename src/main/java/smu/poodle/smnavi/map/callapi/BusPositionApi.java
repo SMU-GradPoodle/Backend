@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.externapi.busarrinfo;
+package smu.poodle.smnavi.map.callapi;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,9 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import smu.poodle.smnavi.map.externapi.util.XmlApiUtil;
-import smu.poodle.smnavi.map.externapi.redis.BusPositionRedisRepository;
-import smu.poodle.smnavi.map.externapi.redis.domain.BusPosition;
+import smu.poodle.smnavi.map.enums.MonitoringBus;
+import smu.poodle.smnavi.common.util.XmlApiUtil;
+import smu.poodle.smnavi.map.redis.repository.BusPositionRedisRepository;
+import smu.poodle.smnavi.map.redis.hash.BusPosition;
 import smu.poodle.smnavi.map.service.BusPositionService;
 
 import java.time.ZonedDateTime;

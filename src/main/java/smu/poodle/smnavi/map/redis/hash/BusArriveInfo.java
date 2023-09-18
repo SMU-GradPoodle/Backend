@@ -1,12 +1,9 @@
-package smu.poodle.smnavi.map.externapi.redis.domain;
+package smu.poodle.smnavi.map.redis.hash;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -21,4 +18,14 @@ public class BusArriveInfo {
     Boolean isNonstop;
     Boolean isLargeInterval;
     Boolean hasIssue;
+
+    public static BusArriveInfo getDefaultInstance() {
+        return BusArriveInfo.builder()
+                .firstArriveMessage("정보 없음")
+                .secondArriveMessage("정보 없음")
+                .isNonstop(false)
+                .isLargeInterval(false)
+                .hasIssue(false)
+                .build();
+    }
 }

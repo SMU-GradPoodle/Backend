@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
-import smu.poodle.smnavi.map.domain.data.TransitType;
+import smu.poodle.smnavi.map.enums.TransitType;
 
 import java.util.*;
 import java.util.function.Function;

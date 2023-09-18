@@ -3,17 +3,13 @@ package smu.poodle.smnavi.map.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.mapping.FullPathAndSubPath;
 import smu.poodle.smnavi.map.domain.mapping.SubPathAndEdge;
 import smu.poodle.smnavi.map.domain.path.FullPath;
-import smu.poodle.smnavi.map.domain.station.Place;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 import smu.poodle.smnavi.map.dto.PathDto;
-import smu.poodle.smnavi.map.dto.RouteDto;
-import smu.poodle.smnavi.map.dto.WaypointDto;
-import smu.poodle.smnavi.map.externapi.GpsPoint;
+import smu.poodle.smnavi.map.callapi.GpsPoint;
 import smu.poodle.smnavi.map.repository.*;
 
 import java.util.ArrayList;
@@ -67,7 +63,7 @@ public class PathService {
             for (SubPathAndEdge edgeInfo : edgeInfos) {
                 gpsPointList.addAll(edgeInfo.getEdge().getDetailPositionList().stream().map((detailPosition -> {
                     return new GpsPoint(detailPosition.getX(), detailPosition.getY());
-                })).collect(Collectors.toList()));
+                })).toList());
             }
         }
 

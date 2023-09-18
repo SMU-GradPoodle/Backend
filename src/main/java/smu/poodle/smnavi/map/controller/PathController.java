@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 import smu.poodle.smnavi.map.dto.PathDto;
-import smu.poodle.smnavi.map.externapi.GpsPoint;
+import smu.poodle.smnavi.map.callapi.GpsPoint;
 import smu.poodle.smnavi.map.response.BaseResponse;
 import smu.poodle.smnavi.map.response.TransitResponse;
 import smu.poodle.smnavi.map.service.PathService;

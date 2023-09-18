@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.externapi.redis.domain;
+package smu.poodle.smnavi.map.redis.hash;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;

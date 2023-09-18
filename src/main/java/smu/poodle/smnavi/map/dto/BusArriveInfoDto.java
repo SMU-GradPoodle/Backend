@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import smu.poodle.smnavi.map.redis.hash.BusArriveInfo;
 import smu.poodle.smnavi.map.domain.station.BusStationInfo;
-import smu.poodle.smnavi.map.externapi.redis.domain.BusArriveInfo;
 
 
 @Getter
@@ -26,7 +26,7 @@ public class BusArriveInfoDto {
 
     public static BusArriveInfoDto generateDto(BusArriveInfo busArriveInfo, BusStationInfo busStationInfo) {
         return BusArriveInfoDto.builder()
-                .stationId(busArriveInfo.getStationId())
+                .stationId(busStationInfo.getStationId())
                 .stationName(busStationInfo.getStationName())
                 .firstArriveMessage(busArriveInfo.getFirstArriveMessage())
                 .secondArriveMessage(busArriveInfo.getSecondArriveMessage())

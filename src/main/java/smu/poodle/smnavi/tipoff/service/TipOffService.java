@@ -11,7 +11,7 @@ import smu.poodle.smnavi.common.dto.PageResult;
 import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
-import smu.poodle.smnavi.map.domain.data.TransitType;
+import smu.poodle.smnavi.map.enums.TransitType;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.map.repository.BusStationRepository;
 import smu.poodle.smnavi.map.repository.SubwayStationRepository;

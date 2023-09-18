@@ -12,7 +12,7 @@ import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.tipoff.domain.Location;
 import smu.poodle.smnavi.tipoff.domain.TipOff;
-import smu.poodle.smnavi.map.domain.data.TransitType;
+import smu.poodle.smnavi.map.enums.TransitType;
 import smu.poodle.smnavi.tipoff.domain.Kind;
 import smu.poodle.smnavi.user.domain.UserEntity;
 import smu.poodle.smnavi.user.sevice.LoginService;

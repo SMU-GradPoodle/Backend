@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import smu.poodle.smnavi.map.domain.data.TransitType;
+import smu.poodle.smnavi.map.enums.TransitType;
 import smu.poodle.smnavi.map.domain.mapping.FullPathAndSubPath;
 import smu.poodle.smnavi.map.domain.mapping.SubPathAndEdge;
 import smu.poodle.smnavi.map.domain.path.DetailPosition;
@@ -27,7 +27,7 @@ public class PathDto {
         int subPathCnt;
         List<SubPathDto> subPathList;
 
-        List<AccidentDto.Info> accidents;
+        List<String> accidents;
 
         @JsonIgnore
         String mapObj;
@@ -37,7 +37,7 @@ public class PathDto {
                     .map(FullPathAndSubPath::getSubPath).toList();
 
             List<PathDto.SubPathDto> subPathDtos = new ArrayList<>();
-            List<AccidentDto.Info> accidents = new ArrayList<>();
+            List<String> accidents = new ArrayList<>();
 
             for (SubPath subPath : subPaths) {
                 // 요구사항에 의해 walk 시간이 0이면 반환하지 않도록 처리

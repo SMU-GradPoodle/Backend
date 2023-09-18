@@ -1,18 +1,17 @@
-package smu.poodle.smnavi.map.externapi.odsay;
+package smu.poodle.smnavi.map.callapi;
 
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import smu.poodle.smnavi.common.errorcode.ExternApiErrorCode;
-import smu.poodle.smnavi.map.domain.data.TransitType;
+import smu.poodle.smnavi.common.util.JsonApiUtil;
+import smu.poodle.smnavi.map.enums.TransitType;
 import smu.poodle.smnavi.map.dto.BusStationDto;
 import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 import smu.poodle.smnavi.map.dto.WaypointDto;
-import smu.poodle.smnavi.map.externapi.ApiConstantValue;
-import smu.poodle.smnavi.map.externapi.ApiKeyValue;
-import smu.poodle.smnavi.map.externapi.ApiUtilMethod;
 import smu.poodle.smnavi.map.service.manage.PathManageService;
 
 import java.util.ArrayList;
@@ -20,11 +19,15 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class TransitRouteApi {
+public class OdsayTransitRouteApi {
 
     private final PathManageService pathManageService;
-    private final ApiConstantValue apiConstantValue;
-
+    @Value("${SMU-X}")
+    private String SMU_X;
+    @Value("${SMU-Y}")
+    private String SMU_Y;
+    @Value("${ODSAY-API-KEY}")
+    private String ODSAY_API_KEY;
 
     public List<PathDto.Info> callApiAndSavePathIfNotExist(
             String startPlaceName, String startX, String startY, List<Integer> indexes) {
@@ -37,13 +40,13 @@ public class TransitRouteApi {
 
         String HOST_URL = "https://api.odsay.com/v1/api/searchPubTransPathT";
 
-        JSONObject transitJson = ApiUtilMethod.urlBuildWithJson(HOST_URL,
+        JSONObject transitJson = JsonApiUtil.urlBuildWithJson(HOST_URL,
                 ExternApiErrorCode.UNSUPPORTED_OR_INVALID_GPS_POINTS,
-                new ApiKeyValue("apiKey", apiConstantValue.getOdsayApiKey()),
+                new ApiKeyValue("apiKey", ODSAY_API_KEY),
                 new ApiKeyValue("SX", startX),
                 new ApiKeyValue("SY", startY),
-                new ApiKeyValue("EX", apiConstantValue.getSMU_X()),
-                new ApiKeyValue("EY", apiConstantValue.getSMU_Y()));
+                new ApiKeyValue("EX", SMU_X),
+                new ApiKeyValue("EY", SMU_Y));
 
         List<PathDto.Info> transitInfoList = parsePathDto(transitJson, indexes);
 

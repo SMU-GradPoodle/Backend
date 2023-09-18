@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.domain.data;
+package smu.poodle.smnavi.map.enums;
 
 import lombok.Getter;
 
