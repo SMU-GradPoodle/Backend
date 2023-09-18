@@ -59,8 +59,4 @@ public class WaypointDto {
                     .build();
         }
     }
-
-
-
-
 }

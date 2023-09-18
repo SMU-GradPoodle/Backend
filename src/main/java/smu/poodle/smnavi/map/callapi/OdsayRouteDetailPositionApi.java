@@ -1,18 +1,16 @@
-package smu.poodle.smnavi.map.externapi.odsay;
+package smu.poodle.smnavi.map.callapi;
 
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import smu.poodle.smnavi.common.util.JsonApiUtil;
 import smu.poodle.smnavi.map.domain.path.DetailPosition;
 import smu.poodle.smnavi.map.domain.path.Edge;
 import smu.poodle.smnavi.common.errorcode.ExternApiErrorCode;
 import smu.poodle.smnavi.map.dto.PathDto;
-import smu.poodle.smnavi.map.externapi.ApiConstantValue;
-import smu.poodle.smnavi.map.externapi.ApiKeyValue;
-import smu.poodle.smnavi.map.externapi.ApiUtilMethod;
-import smu.poodle.smnavi.map.externapi.GpsPoint;
 import smu.poodle.smnavi.map.repository.DetailPositionRepository;
 import smu.poodle.smnavi.map.repository.TransitRepository;
 
@@ -22,10 +20,12 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Transactional
-public class RouteDetailPositionApi {
-    private final ApiConstantValue apiConstantValue;
+public class OdsayRouteDetailPositionApi {
     private final TransitRepository transitRepository;
     private final DetailPositionRepository detailPositionRepository;
+
+    @Value("${ODSAY-API-KEY}")
+    private String odsayApiKey;
 
     public void callApiForSaveDetailPositionList(PathDto.SubPathDto subPathDto, String mapObj, List<Edge> edges) {
         boolean detailExist = true;
@@ -39,9 +39,9 @@ public class RouteDetailPositionApi {
 
         String HOST_URL = "https://api.odsay.com/v1/api/loadLane";
 
-        JSONObject jsonObject = ApiUtilMethod.urlBuildWithJson(HOST_URL,
+        JSONObject jsonObject = JsonApiUtil.urlBuildWithJson(HOST_URL,
                 ExternApiErrorCode.UNSUPPORTED_OR_INVALID_GPS_POINTS,
-                new ApiKeyValue("apiKey", apiConstantValue.getOdsayApiKey()),
+                new ApiKeyValue("apiKey", odsayApiKey),
                 new ApiKeyValue("mapObject", "0:0@" + mapObj));
 
         JSONObject info = jsonObject.getJSONObject("result").getJSONArray("lane").getJSONObject(0);

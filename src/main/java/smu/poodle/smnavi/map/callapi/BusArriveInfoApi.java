@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.externapi.busarrinfo;
+package smu.poodle.smnavi.map.callapi;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,9 +9,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import smu.poodle.smnavi.map.externapi.util.XmlApiUtil;
-import smu.poodle.smnavi.map.externapi.redis.BusArriveInfoRedisRepository;
-import smu.poodle.smnavi.map.externapi.redis.domain.BusArriveInfo;
+import smu.poodle.smnavi.map.enums.MonitoringBus;
+import smu.poodle.smnavi.common.util.XmlApiUtil;
+import smu.poodle.smnavi.map.redis.repository.BusArriveInfoRedisRepository;
+import smu.poodle.smnavi.map.redis.hash.BusArriveInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,17 +33,8 @@ public class BusArriveInfoApi {
     @Value("${PUBLIC_DATA_API_KEY}")
     private String SERVICE_KEY;
 
-    private String makeUrl(String busRouteId) {
-
-        final String API_BASE_URL = "http://ws.bus.go.kr/api/rest/arrive/getArrInfoByRouteAll";
-
-        return API_BASE_URL + "?"
-                + "serviceKey=" + SERVICE_KEY + "&"
-                + "busRouteId=" + busRouteId;
-    }
-
     @Scheduled(cron = "0 0/1 6-20 * * *")
-    public void parseDtoFromXml() {
+    public List<BusArriveInfo> parseDtoFromXml() {
         Document xmlContent = XmlApiUtil.getRootTag(makeUrl(MonitoringBus.BUS_7016.getBusRouteId()));
         Element msgBody = (Element) xmlContent.getElementsByTagName("msgBody").item(0);
 
@@ -74,9 +66,17 @@ public class BusArriveInfoApi {
             }
         }
 
-        log.info("정보 저장");
-        busArriveInfoRedisRepository.deleteAll();
         busArriveInfoRedisRepository.saveAll(busArriveInfoList);
+        return busArriveInfoList;
+    }
+
+    private String makeUrl(String busRouteId) {
+
+        final String API_BASE_URL = "http://ws.bus.go.kr/api/rest/arrive/getArrInfoByRouteAll";
+
+        return API_BASE_URL + "?"
+                + "serviceKey=" + SERVICE_KEY + "&"
+                + "busRouteId=" + busRouteId;
     }
 
     @Scheduled(cron = "* 1 20 * * *")

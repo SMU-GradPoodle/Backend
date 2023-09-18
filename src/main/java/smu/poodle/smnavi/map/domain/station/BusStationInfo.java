@@ -1,13 +1,15 @@
 package smu.poodle.smnavi.map.domain.station;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import smu.poodle.smnavi.map.dto.BusStationInfoDto;
 
 @Entity
 @Getter
@@ -18,30 +20,15 @@ import smu.poodle.smnavi.map.dto.BusStationInfoDto;
 public class BusStationInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
-    @Column
-    private String stationName;
+    String stationName;
 
-    @Column
-    private String busName;
+    String busName;
 
-    @Column
-    private String stationId;
+    String stationId;
 
-    @Column
-    private String x;
+    String x;
 
-    @Column
-    private String y;
-
-    public BusStationInfoDto toDto(){
-        return BusStationInfoDto.builder()
-                .stationName(this.stationName)
-                .busName(this.busName)
-                .stationId(this.stationId)
-                .x(this.x)
-                .y(this.y)
-                .build();
-    }
+    String y;
 }

@@ -3,10 +3,10 @@ package smu.poodle.smnavi.map.domain.path;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import smu.poodle.smnavi.map.domain.data.BusType;
-import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.mapping.SubPathAndEdge;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
+import smu.poodle.smnavi.map.enums.BusType;
+import smu.poodle.smnavi.map.enums.TransitType;
 
 import java.util.List;
 

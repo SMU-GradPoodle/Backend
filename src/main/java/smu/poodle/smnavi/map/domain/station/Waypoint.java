@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import smu.poodle.smnavi.map.domain.Accident;
 import smu.poodle.smnavi.map.domain.path.FullPath;
 import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 
@@ -31,9 +30,6 @@ public abstract class Waypoint {
 
     @OneToMany(mappedBy = "startWaypoint")
     List<FullPath> fullPaths;
-
-    @OneToMany(mappedBy = "waypoint")
-    List<Accident> accidents;
 
     public abstract String getPointName();
 

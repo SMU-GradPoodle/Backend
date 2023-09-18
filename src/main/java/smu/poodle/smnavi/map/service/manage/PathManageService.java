@@ -3,15 +3,15 @@ package smu.poodle.smnavi.map.service.manage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import smu.poodle.smnavi.map.domain.data.BusType;
-import smu.poodle.smnavi.map.domain.data.TransitType;
+import smu.poodle.smnavi.map.enums.BusType;
+import smu.poodle.smnavi.map.enums.TransitType;
 import smu.poodle.smnavi.map.domain.path.Edge;
 import smu.poodle.smnavi.map.domain.path.FullPath;
 import smu.poodle.smnavi.map.domain.path.SubPath;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.dto.WaypointDto;
-import smu.poodle.smnavi.map.externapi.odsay.RouteDetailPositionApi;
+import smu.poodle.smnavi.map.callapi.OdsayRouteDetailPositionApi;
 import smu.poodle.smnavi.map.service.EdgeService;
 import smu.poodle.smnavi.map.service.FullPathService;
 import smu.poodle.smnavi.map.service.SubPathService;
@@ -29,7 +29,7 @@ public class PathManageService {
     private final EdgeService edgeService;
     private final SubPathService subPathService;
     private final FullPathService fullPathService;
-    private final RouteDetailPositionApi routeDetailPositionApi;
+    private final OdsayRouteDetailPositionApi odsayRouteDetailPositionApi;
 
     @Transactional
     public void savePath(WaypointDto.PlaceDto startPlace, PathDto.Info pathDto) {
@@ -61,7 +61,7 @@ public class PathManageService {
             List<Edge> persistedEdgeList = edgeService.makeAndSaveEdgeIfNotExist(persistedWaypointList);
 
             //엣지의 디테일 루트 만들기
-            routeDetailPositionApi.callApiForSaveDetailPositionList(subPathDto,
+            odsayRouteDetailPositionApi.callApiForSaveDetailPositionList(subPathDto,
                     mapObjArr.remove(0),
                     persistedEdgeList);
 

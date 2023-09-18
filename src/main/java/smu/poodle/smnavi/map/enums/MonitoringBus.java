@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.externapi.busarrinfo;
+package smu.poodle.smnavi.map.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

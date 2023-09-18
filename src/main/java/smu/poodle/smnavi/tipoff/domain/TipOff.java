@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import smu.poodle.smnavi.common.domain.BaseTimeEntity;
-import smu.poodle.smnavi.map.domain.data.TransitType;
+import smu.poodle.smnavi.map.enums.TransitType;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.user.domain.UserEntity;
 
