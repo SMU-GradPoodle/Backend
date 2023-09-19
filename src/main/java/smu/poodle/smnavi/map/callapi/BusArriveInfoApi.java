@@ -33,7 +33,7 @@ public class BusArriveInfoApi {
     @Value("${PUBLIC_DATA_API_KEY}")
     private String SERVICE_KEY;
 
-    @Scheduled(cron = "0 0/1 6-20 * * *")
+    @Scheduled(cron = "0/30 * 6-20 * * *")
     public List<BusArriveInfo> parseDtoFromXml() {
         Document xmlContent = XmlApiUtil.getRootTag(makeUrl(MonitoringBus.BUS_7016.getBusRouteId()));
         Element msgBody = (Element) xmlContent.getElementsByTagName("msgBody").item(0);
@@ -79,7 +79,7 @@ public class BusArriveInfoApi {
                 + "busRouteId=" + busRouteId;
     }
 
-    @Scheduled(cron = "* 1 20 * * *")
+    @Scheduled(cron = "* 5 21 * * *")
     public void deleteBusArriveCache() {
         busArriveInfoRedisRepository.deleteAll();
     }
