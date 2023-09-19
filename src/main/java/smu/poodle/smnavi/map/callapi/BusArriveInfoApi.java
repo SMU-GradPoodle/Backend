@@ -35,6 +35,7 @@ public class BusArriveInfoApi {
 
     @Scheduled(cron = "0 0/1 6-20 * * *")
     public List<BusArriveInfo> parseDtoFromXml() {
+        System.out.println("실행 돼요");
         Document xmlContent = XmlApiUtil.getRootTag(makeUrl(MonitoringBus.BUS_7016.getBusRouteId()));
         Element msgBody = (Element) xmlContent.getElementsByTagName("msgBody").item(0);
 
@@ -79,7 +80,7 @@ public class BusArriveInfoApi {
                 + "busRouteId=" + busRouteId;
     }
 
-    @Scheduled(cron = "* 1 20 * * *")
+    @Scheduled(cron = "* 5 21 * * *")
     public void deleteBusArriveCache() {
         busArriveInfoRedisRepository.deleteAll();
     }

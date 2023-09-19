@@ -98,4 +98,9 @@ public class BusPositionApi {
         busPositionRedisRepository.saveAll(busPositionList);
         log.info(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.SSS")) + " 끝난 시간");
     }
+
+    @Scheduled(cron = "* 5 21 * * *")
+    public void deleteBusPositionCache() {
+        busPositionRedisRepository.deleteAll();
+    }
 }
