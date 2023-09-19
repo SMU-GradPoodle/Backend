@@ -45,7 +45,7 @@ public class BusPositionApi {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0/1 6-20 * * *")
+    @Scheduled(cron = "0/30 * 6-20 * * *")
     public void cachingBusPosition() {
         log.info(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.SSS")) + " 버스 교통 이슈 확인 시작 시간");
 
@@ -89,14 +89,12 @@ public class BusPositionApi {
                 BusPosition cachedBusPosition = busPositionMap.getOrDefault(busPosition.getLicensePlate(), null);
 
                 if (cachedBusPosition != null && cachedBusPosition.getHasIssue()) {
-                    log.info("기존 이슈에 의해 새로운 이슈 true 설정");
                     busPosition.setHasIssue(true);
                 }
             }
         }
         busPositionRedisRepository.deleteAll();
         busPositionRedisRepository.saveAll(busPositionList);
-        log.info(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.SSS")) + " 끝난 시간");
     }
 
     @Scheduled(cron = "* 5 21 * * *")
