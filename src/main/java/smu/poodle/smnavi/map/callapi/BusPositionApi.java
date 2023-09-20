@@ -73,7 +73,8 @@ public class BusPositionApi {
                     .build());
         }
 
-        if (ZonedDateTime.now().getMinute() % 6 == 0) {
+        ZonedDateTime now = ZonedDateTime.now();
+        if (now.getMinute() % 6 == 0 && now.getSecond() < 10) {
             log.info(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.SSS")) + " 버스 교통 이슈 확인");
             busPositionService.catchAccidentInfo(busPositionList);
         } else {
