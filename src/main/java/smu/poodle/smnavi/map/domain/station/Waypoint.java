@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-//경유지점
 public abstract class Waypoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

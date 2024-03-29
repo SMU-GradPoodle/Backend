@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    url: ${RDS_URL}
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        show_sql: true
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+
+  mail:
+    properties:
+      debug: 'true'
+      mail:
+        smtp:
+          starttls:
+            enable: 'true'
+          auth: 'true'
+    host: smtp.gmail.com
+    username: ${GMAIL_EMAIL}
+    password: ${GMAIL_PASSWORD}
+    port: 587
+
+
+spring.data.redis:
+  port: 6379
+  host: redis
+
+aws:
+  secretsmanager:
+    name: smunavi
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2

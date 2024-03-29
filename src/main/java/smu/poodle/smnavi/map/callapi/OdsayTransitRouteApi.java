@@ -22,10 +22,9 @@ import java.util.List;
 public class OdsayTransitRouteApi {
 
     private final PathManageService pathManageService;
-    @Value("${SMU-X}")
-    private String SMU_X;
-    @Value("${SMU-Y}")
-    private String SMU_Y;
+    private static final String SMU_X = "126.955252";
+    private static final String SMU_Y = "37.602638";
+    
     @Value("${ODSAY-API-KEY}")
     private String ODSAY_API_KEY;
 

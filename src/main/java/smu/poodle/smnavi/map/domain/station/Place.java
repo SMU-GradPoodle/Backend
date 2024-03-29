@@ -17,7 +17,7 @@ import smu.poodle.smnavi.map.dto.WaypointDto;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Place extends Waypoint{
+public class Place extends Waypoint {
     @Column(unique = true)
     String placeName;
 

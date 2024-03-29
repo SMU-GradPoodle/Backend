@@ -1,8 +1,0 @@
-aws:
-  secretsmanager:
-    name: smunavi
-
-cloud:
-  aws:
-    region:
-      static: ap-northeast-2
