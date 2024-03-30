@@ -11,6 +11,7 @@ import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 
 import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 import java.util.Random;
 
 @RequiredArgsConstructor
@@ -30,21 +31,20 @@ public class EmailService {
         return certificationKey;
     }
 
-    public static String createCertificationKey() {
+    private String createCertificationKey() {
         StringBuilder key = new StringBuilder();
-        Random random = new Random();
+        SecureRandom secureRandom = new SecureRandom();
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
         for (int i = 0; i < 6; i++) {
-            int index = random.nextInt(characters.length());
+            int index = secureRandom.nextInt(characters.length());
             char randomChar = characters.charAt(index);
             key.append(randomChar);
         }
         return key.toString();
     }
 
-
-    public MimeMessage createMessage(String certificationKey) {
+    private MimeMessage createMessage(String certificationKey) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
         try {

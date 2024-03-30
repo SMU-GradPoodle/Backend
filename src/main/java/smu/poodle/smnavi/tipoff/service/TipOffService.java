@@ -23,10 +23,13 @@ import smu.poodle.smnavi.tipoff.dto.TipOffRequestDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffResponseDto;
 import smu.poodle.smnavi.tipoff.repository.TipOffRepository;
 import smu.poodle.smnavi.user.sevice.LoginService;
+import smu.poodle.smnavi.user.util.LoginUserUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static smu.poodle.smnavi.user.util.LoginUserUtil.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +42,8 @@ public class TipOffService {
 
     @Transactional
     @Validated
-    public TipOffResponseDto.Simple registerTipOff(@Valid TipOffRequestDto tipOffRequestDto) {
-        TipOff tipOff = tipOffRequestDto.ToEntity(loginService.getLoginMemberId());
+    public TipOffResponseDto.Simple registerTipOff(TipOffRequestDto tipOffRequestDto) {
+        TipOff tipOff = tipOffRequestDto.ToEntity(getLoginMemberId());
 
         if (tipOff.getTransitType() == TransitType.BUS) {
             Waypoint waypoint = busStationRepository.findAllByLocalStationId(tipOffRequestDto.getStationId()).get(0);
@@ -77,10 +80,10 @@ public class TipOffService {
 
     //todo : 제목 검색이 의미가 있는가?
     public PageResult<TipOffResponseDto.Detail> getTipOffList(Boolean isMine, Pageable pageable) {
-        Page<TipOff> tipOffPage = tipOffRepository.findByQuery(isMine, loginService.getLoginMemberId(), pageable);
+        Page<TipOff> tipOffPage = tipOffRepository.findByQuery(isMine, getLoginMemberId(), pageable);
 
         return PageResult.of(tipOffPage.map((tipOff -> TipOffResponseDto.Detail.of(tipOff,
-                thumbService.getLikeInfo(tipOff.getId()), loginService.getLoginMemberId()))));
+                thumbService.getLikeInfo(tipOff.getId()), getLoginMemberId()))));
     }
 
     @Transactional(readOnly = true)
@@ -88,7 +91,7 @@ public class TipOffService {
         TipOff tipOff = tipOffRepository.findById(id).orElseThrow(() ->
                 new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
         LikeInfoDto likeInfoDto = thumbService.getLikeInfo(tipOff.getId());
-        return TipOffResponseDto.Detail.of(tipOff, likeInfoDto, loginService.getLoginMemberId());
+        return TipOffResponseDto.Detail.of(tipOff, likeInfoDto, getLoginMemberId());
     }
 
 
@@ -108,7 +111,7 @@ public class TipOffService {
             }
         }
         else{
-            if(!Objects.equals(tipOff.getAuthor().getId(), loginService.getLoginMemberId())) {
+            if(!Objects.equals(tipOff.getAuthor().getId(), getLoginMemberId())) {
                 throw new RestApiException(CommonErrorCode.FORBIDDEN);
             }
         }

@@ -20,15 +20,15 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
-import smu.poodle.smnavi.user.domain.Authority;
 import smu.poodle.smnavi.user.domain.UserEntity;
-import smu.poodle.smnavi.user.dto.TokenResponseDto;
 
 import java.security.Key;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
+
+import static smu.poodle.smnavi.user.jwt.TokenType.*;
 
 
 @Component
@@ -49,7 +49,16 @@ public class TokenProvider {
         refershTokenKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshTokenSecretKey));
     }
 
-    private String generateToken(TokenType tokenType, Long userId, String authority, long nowMillisecond) {
+    public String createAccessTokenByRefreshToken(String refreshToken) {
+        Claims claims = parseTokenClaims(REFRESH_TOKEN, refreshToken);
+        String userId = claims.getSubject();
+        String authority = claims.get(AUTHORITY_KEY).toString();
+        return createToken(REFRESH_TOKEN, Long.parseLong(userId), authority);
+    }
+
+    public String createToken(TokenType tokenType, Long userId, String authority) {
+        long nowMillisecond = new Date().getTime();
+
         return Jwts.builder()
                 .setIssuer("poodle")
                 .setSubject(userId.toString())
@@ -59,28 +68,8 @@ public class TokenProvider {
                 .compact();
     }
 
-    private TokenResponseDto generateTokenResponse(TokenType tokenType, Long userId, String authority) {
-        long nowMillisecond = new Date().getTime();
-        return TokenResponseDto.builder()
-                .token(generateToken(tokenType, userId, authority, nowMillisecond))
-                .expiresAt((nowMillisecond + tokenType.getValidMillisecond()))
-                .role(Authority.valueOf(authority).getRoleName())
-                .build();
-    }
-
-    public TokenResponseDto generateTokenResponse(TokenType tokenType, Authentication authentication) {
-        return generateTokenResponse(tokenType,
-                Long.valueOf(authentication.getName()),
-                authentication.getAuthorities().iterator().next().getAuthority());
-    }
-
-    public TokenResponseDto generateTokenResponse(TokenType tokenType, UserEntity user) {
-        return generateTokenResponse(tokenType, user.getId(), user.getGrantedAuthority().toString());
-    }
-
-
-    public Authentication getAuthentication(String token) {
-        Claims claims = parseClaims(token, accessTokenKey);
+    public Authentication createAuthenticationByAccessToken(String accessToken) {
+        Claims claims = parseClaims(accessToken, accessTokenKey);
 
         if (ObjectUtils.isEmpty(claims.get(AUTHORITY_KEY))) {
             throw new RestApiException(CommonErrorCode.INVALID_TOKEN);
@@ -94,7 +83,13 @@ public class TokenProvider {
         parseTokenClaims(tokenType, token);
     }
 
-    public Claims parseTokenClaims(TokenType tokenType, String token) {
+    public long getExpirationSeconds(TokenType tokenType, String token) {
+        Claims claims = parseTokenClaims(tokenType, token);
+        long expirationTime = claims.getExpiration().getTime();
+        return (expirationTime - System.currentTimeMillis()) / 1000;
+    }
+
+    private Claims parseTokenClaims(TokenType tokenType, String token) {
         return parseClaims(token, getKey(tokenType));
     }
 
@@ -121,7 +116,7 @@ public class TokenProvider {
     }
 
     public String getRefreshToken(HttpServletRequest request) {
-        String token = getCookieByName(request, TokenType.REFRESH_TOKEN.getHeader()).orElseThrow(() ->
+        String token = getCookieByName(request, REFRESH_TOKEN.getHeader()).orElseThrow(() ->
                 new RestApiException(CommonErrorCode.REFRESH_TOKEN_NOT_EXIST)
         );
 
@@ -145,9 +140,9 @@ public class TokenProvider {
     }
 
     private Key getKey(TokenType tokenType) {
-        if (tokenType == TokenType.ACCESS_TOKEN) {
+        if (tokenType == ACCESS_TOKEN) {
             return accessTokenKey;
-        } else if (tokenType == TokenType.REFRESH_TOKEN) {
+        } else if (tokenType == REFRESH_TOKEN) {
             return refershTokenKey;
         }
         return null;

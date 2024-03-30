@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.user.redis;
+package smu.poodle.smnavi.user.redisdomain;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,12 +10,12 @@ import org.springframework.data.redis.core.TimeToLive;
 @Getter
 @Setter
 @Builder
-@RedisHash("certification_mail")
-public class CertificationMail {
+@RedisHash("mail_verification")
+public class MailVerificationCache {
     @Id
     String email;
-    String certificationKey;
-    Boolean isCertificate;
+    String verificationKey;
+    Boolean isVerify;
     @TimeToLive
     Long expiration;
 }

@@ -14,18 +14,20 @@ import smu.poodle.smnavi.tipoff.dto.LikeInfoDto;
 import smu.poodle.smnavi.tipoff.repository.ThumbsRepository;
 import smu.poodle.smnavi.user.domain.UserEntity;
 import smu.poodle.smnavi.user.sevice.LoginService;
+import smu.poodle.smnavi.user.util.LoginUserUtil;
 
 import java.util.Optional;
+
+import static smu.poodle.smnavi.user.util.LoginUserUtil.*;
 
 @Service
 @RequiredArgsConstructor
 public class ThumbService {
     private final ThumbsRepository thumbsRepository;
-    private final LoginService loginService;
 
     @Transactional
     public LikeInfoDto doLikeOrHate(Long tipOffId, ThumbStatus thumbStatus) {
-        Long userId = loginService.getLoginMemberId();
+        Long userId = getLoginMemberId();
 
         if(userId == 0) {
             throw new RestApiException(CommonErrorCode.LOGIN_REQUIRED);
@@ -51,7 +53,7 @@ public class ThumbService {
 
     @Transactional
     public LikeInfoDto getLikeInfo(Long tipOffId) {
-        Long userId = loginService.getLoginMemberId();
+        Long userId = getLoginMemberId();
 
         Long likeCount = thumbsRepository.getLikeCount(tipOffId);
         Long hateCount = thumbsRepository.getHateCount(tipOffId);

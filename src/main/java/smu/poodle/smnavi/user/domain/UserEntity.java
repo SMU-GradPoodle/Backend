@@ -30,12 +30,4 @@ public class UserEntity {
 
     @Enumerated(EnumType.STRING)
     Authority authority;
-
-    @OneToOne(mappedBy = "user")
-    JwtRefreshToken jwtRefreshToken;
-
-    public Collection<GrantedAuthority> getGrantedAuthority() {
-        return Collections.singleton(new SimpleGrantedAuthority(authority.toString()));
-    }
-
 }

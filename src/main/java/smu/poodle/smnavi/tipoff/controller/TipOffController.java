@@ -41,7 +41,7 @@ public class TipOffController {
     /**
      * 제보글 단건 조회
      */
-    @GetMapping("/api/info/{id}") //제보 id별로 조회
+    @GetMapping("/api/info/{id}")
     public BaseResponse<TipOffResponseDto.Detail> getTipOffById(@PathVariable(value = "id") Long id) {
         TipOffResponseDto.Detail infoDtoId = tipOffService.getTipOffById(id);
         return BaseResponse.ok(infoDtoId);
