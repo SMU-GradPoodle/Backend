@@ -43,20 +43,8 @@ public class SecurityConfig {
                         configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                .authorizeHttpRequests((authorizeRequest) ->
-                        authorizeRequest
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/**").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/**").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/**").permitAll()
-                                .requestMatchers(HttpMethod.OPTIONS, "/**")
-                                .permitAll()
-                )
-
                 .formLogin(AbstractHttpConfigurer::disable)
 
-                //인증되지 않은 자원에 접근했을 때
                 .exceptionHandling((configurer) ->
                         configurer
                                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))

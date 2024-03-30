@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import smu.poodle.smnavi.user.auth.Authority;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -20,7 +20,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
-import smu.poodle.smnavi.user.auth.Authority;
+import smu.poodle.smnavi.user.domain.Authority;
 import smu.poodle.smnavi.user.domain.UserEntity;
 import smu.poodle.smnavi.user.dto.TokenResponseDto;
 

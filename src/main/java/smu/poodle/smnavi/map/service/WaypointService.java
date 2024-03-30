@@ -52,12 +52,6 @@ public class WaypointService {
        return wayPointRepository.getSmuWayPoint();
     }
 
-    /**
-     * Waypoint 의 필드를 바탕으로 db에 있는지 여부를 반환
-     *
-     * @return 존재하는 지점이면 저장된 waypoint 반환
-     * 존재하지 않는 지점이거나 optional.empty 반환
-     */
     private Optional<? extends Waypoint> findWaypoint(Waypoint waypoint) {
         if (waypoint instanceof BusStation) {
             return findBusStation((BusStation) waypoint);

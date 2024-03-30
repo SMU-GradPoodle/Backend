@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum DetailErrorCode implements ErrorCode{
+public enum DetailErrorCode implements ErrorCode {
     DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다."),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 가입 된 이메일입니다."),
     DUPLICATION_ERROR(HttpStatus.CONFLICT, "이미 등록된 글입니다."),

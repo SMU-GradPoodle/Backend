@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import smu.poodle.smnavi.user.auth.Authority;
+import smu.poodle.smnavi.user.domain.Authority;
 import smu.poodle.smnavi.user.domain.UserEntity;
 
 public class AuthRequestDto {
