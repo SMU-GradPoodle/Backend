@@ -34,7 +34,7 @@ public class BusArriveInfoApi {
     private String SERVICE_KEY;
 
     @Scheduled(cron = "0/30 * 6-20 * * *")
-    public List<BusArriveInfo> parseDtoFromXml() {
+    public void parseDtoFromXml() {
         Document xmlContent = XmlApiUtil.getRootTag(makeUrl(MonitoringBus.BUS_7016.getBusRouteId()));
         Element msgBody = (Element) xmlContent.getElementsByTagName("msgBody").item(0);
 
@@ -67,7 +67,6 @@ public class BusArriveInfoApi {
         }
 
         busArriveInfoRedisRepository.saveAll(busArriveInfoList);
-        return busArriveInfoList;
     }
 
     private String makeUrl(String busRouteId) {
@@ -79,7 +78,7 @@ public class BusArriveInfoApi {
                 + "busRouteId=" + busRouteId;
     }
 
-    @Scheduled(cron = "* 5 21 * * *")
+    @Scheduled(cron = "* 1 20 * * *")
     public void deleteBusArriveCache() {
         busArriveInfoRedisRepository.deleteAll();
     }
@@ -94,7 +93,8 @@ public class BusArriveInfoApi {
 
         if (extractedNumber.size() == 2) {
             minutes = extractedNumber.get(0);
-        } else if (extractedNumber.size() == 3) {
+        }
+        if (extractedNumber.size() == 3) {
             minutes = extractedNumber.get(0);
             seconds = extractedNumber.get(1);
         }
