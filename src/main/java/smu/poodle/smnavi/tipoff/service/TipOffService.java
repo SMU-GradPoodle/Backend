@@ -52,7 +52,7 @@ public class TipOffService {
     @Transactional
     public TipOffResponseDto.Simple updateInfo(Long id, TipOffRequestDto tipOffRequestDto) {
         TipOff tipOff = tipOffRepository.findById(id)
-                .orElseThrow(() -> new RestApiException(CommonStatusCode.RESOURCE_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(CommonStatusCode.NOT_FOUND));
 
         authorizationTipOff(tipOff, tipOffRequestDto.getPassword());
 
@@ -82,7 +82,7 @@ public class TipOffService {
     @Transactional(readOnly = true)
     public TipOffResponseDto.Detail getTipOffById(Long id) {
         TipOff tipOff = tipOffRepository.findById(id).orElseThrow(() ->
-                new RestApiException(CommonStatusCode.RESOURCE_NOT_FOUND));
+                new RestApiException(CommonStatusCode.NOT_FOUND));
         LikeInfoDto likeInfoDto = thumbService.getLikeInfo(tipOff.getId());
         return TipOffResponseDto.Detail.of(tipOff, likeInfoDto, getLoginMemberId());
     }

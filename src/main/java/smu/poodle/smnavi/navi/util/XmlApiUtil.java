@@ -27,7 +27,7 @@ public class XmlApiUtil {
         }
         catch (ParserConfigurationException | SAXException | IOException e) {
             //todo : 에러코드 반환 형식을 좀 더 이해하기 쉽게 바꾸기
-            throw new RestApiException(CommonStatusCode.RESOURCE_NOT_FOUND);
+            throw new RestApiException(CommonStatusCode.NOT_FOUND);
         }
     }
 }

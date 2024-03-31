@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import smu.poodle.smnavi.common.exception.RestApiException;
 
 import java.io.IOException;
 
@@ -25,9 +26,8 @@ public class JwtFilter extends OncePerRequestFilter {
             Authentication authentication = tokenProvider.createAuthenticationByAccessToken(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        catch (Exception ignored) {
+        catch (RestApiException ignored) {
         }
-        //todo : 이 메서드가 뭘 의미하는지?
         filterChain.doFilter(request, response);
     }
 }

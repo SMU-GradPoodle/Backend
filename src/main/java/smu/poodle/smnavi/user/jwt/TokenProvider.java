@@ -82,14 +82,14 @@ public class TokenProvider {
         return new UsernamePasswordAuthenticationToken(claims.getSubject(), "", authority);
     }
 
-    public void validateToken(TokenType tokenType, String token) {
-        parseTokenClaims(tokenType, token);
-    }
-
     public long getExpirationSeconds(TokenType tokenType, String token) {
         Claims claims = parseTokenClaims(tokenType, token);
         long expirationTime = claims.getExpiration().getTime();
         return (expirationTime - System.currentTimeMillis()) / 1000;
+    }
+
+    public void validateToken(TokenType tokenType, String token) {
+        parseTokenClaims(tokenType, token);
     }
 
     private Claims parseTokenClaims(TokenType tokenType, String token) {

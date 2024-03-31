@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.navi.domain.station;
+package smu.poodle.smnavi.navi.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

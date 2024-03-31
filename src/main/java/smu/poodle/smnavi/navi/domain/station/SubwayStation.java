@@ -14,8 +14,8 @@ import smu.poodle.smnavi.navi.dto.WaypointDto;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubwayStation extends Waypoint {
-    Integer stationId; //역 아이디
-    String stationName; //역 이름
+    Integer stationId;
+    String stationName;
 
     @Override
     public String getPointName() {

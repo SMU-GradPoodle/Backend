@@ -25,7 +25,7 @@ tasks.getByName<Jar>("jar") {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
 
-    implementation("org.springframework.boot:spring-boot-starter-batch")
+    runtimeOnly("com.mysql:mysql-connector-j")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
@@ -36,9 +36,8 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.1")
     implementation("org.springframework.cloud:spring-cloud-starter-aws-secrets-manager-config:2.2.6.RELEASE")
 
-    runtimeOnly("com.mysql:mysql-connector-j")
 
-    implementation("org.json:json:20230227")
+    implementation("org.json:json:20231013")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

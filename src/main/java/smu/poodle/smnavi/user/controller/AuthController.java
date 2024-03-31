@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,50 +19,52 @@ import smu.poodle.smnavi.user.sevice.SignupService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/user")
+@PreAuthorize("permitAll()")
 public class AuthController {
     private final SignupService signupService;
     private final LoginService loginService;
     private final TokenService tokenService;
 
-    @PostMapping("/user/check-duplicate-nickname")
+    @PostMapping("/check-duplicate-nickname")
     public BaseResponse<Void> checkDuplicateNickname(@RequestBody @Valid AuthRequestDto.Nickname authRequestDto) {
         signupService.checkDuplicateNickname(authRequestDto);
 
         return BaseResponse.ok();
     }
 
-    @PostMapping("/user/send-verification-mail")
+    @PostMapping("/send-verification-mail")
     public BaseResponse<Void> sendVerificationMail(@RequestBody @Valid AuthRequestDto.Certification authRequestDto) {
         signupService.sendVerificationMail(authRequestDto);
 
         return BaseResponse.ok();
     }
 
-    @PostMapping("/user/verification-main")
+    @PostMapping("/verification-mail")
     public BaseResponse<Void> verifyMail(@RequestBody @Valid AuthRequestDto.Certification authRequestDto) {
         signupService.authenticateMail(authRequestDto);
 
         return BaseResponse.ok();
     }
 
-    @PostMapping("/user/signup")
+    @PostMapping("/signup")
+    @PreAuthorize("permitAll()")
     public BaseResponse<Void> signup(@RequestBody AuthRequestDto.SignUp authRequestDto){
         signupService.signup(authRequestDto);
         return BaseResponse.ok();
     }
 
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     public BaseResponse<TokenResponseDto> login(HttpServletResponse response, @RequestBody AuthRequestDto.Login authRequestDto) {
         return BaseResponse.ok(loginService.login(response, authRequestDto));
     }
 
-    @PostMapping("/user/refresh")
+    @PostMapping("/refresh")
     public BaseResponse<String> refreshAccessToken(HttpServletRequest request) {
         return BaseResponse.ok(tokenService.refreshAccessToken(request));
     }
 
-    @PostMapping("/user/delete-refresh-token")
+    @PostMapping("/delete-refresh-token")
     public BaseResponse<Void> deleteRefreshToken(HttpServletRequest request) {
         tokenService.deleteRefreshToken(request);
         return BaseResponse.ok();

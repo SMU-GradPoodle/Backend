@@ -41,8 +41,4 @@ public class Edge {
     public void setDetailExistTrue() {
         this.detailExist = true;
     }
-
-    public void setDetailPositionList(List<DetailPosition> detailPositionList) {
-        this.detailPositionList = detailPositionList;
-    }
 }

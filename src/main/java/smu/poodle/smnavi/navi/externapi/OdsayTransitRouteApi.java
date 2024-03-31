@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import smu.poodle.smnavi.navi.domain.station.Waypoint;
 import smu.poodle.smnavi.navi.dto.ApiKeyValueDto;
 import smu.poodle.smnavi.navi.exception.ExternApiStatusCode;
 import smu.poodle.smnavi.navi.util.JsonApiUtil;
@@ -22,23 +23,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class OdsayTransitRouteApi {
-
-    private final AdminNaviService adminNaviService;
     private static final String SMU_X = "126.955252";
     private static final String SMU_Y = "37.602638";
-    
+
     @Value("${ODSAY-API-KEY}")
     private String ODSAY_API_KEY;
 
-    public void callApiAndSavePathIfNotExist(
-            String startPlaceName, String startX, String startY, List<Integer> indexes) {
-
-        WaypointDto.PlaceDto startPlace = WaypointDto.PlaceDto.builder()
-                .placeName(startPlaceName)
-                .gpsX(startX)
-                .gpsY(startY)
-                .build();
-
+    public List<PathDto.Info> callApi(String startX, String startY, List<Integer> indexes) {
         String HOST_URL = "https://api.odsay.com/v1/api/searchPubTransPathT";
 
         JSONObject transitJson = JsonApiUtil.urlBuildWithJson(HOST_URL,
@@ -49,11 +40,7 @@ public class OdsayTransitRouteApi {
                 new ApiKeyValueDto("EX", SMU_X),
                 new ApiKeyValueDto("EY", SMU_Y));
 
-        List<PathDto.Info> transitInfoList = parsePathDto(transitJson, indexes);
-
-        for (PathDto.Info path : transitInfoList) {
-            adminNaviService.savePath(startPlace, path);
-        }
+        return parsePathDto(transitJson, indexes);
     }
 
     private List<PathDto.Info> parsePathDto(JSONObject transitJson, List<Integer> indexes) {
@@ -112,7 +99,6 @@ public class OdsayTransitRouteApi {
 
                 JSONObject lane = subPathJson.getJSONArray("lane").getJSONObject(0);
 
-                //todo: switch-case 문으로 바꾸자
                 if (type == TransitType.BUS) {
                     laneName = lane.getString("busNo");
                     busTypeInt = lane.getInt("type");
@@ -135,7 +121,6 @@ public class OdsayTransitRouteApi {
         }
         return subPathDtoList;
     }
-
 
     private List<AbstractWaypointDto> makeStationDtoList(JSONObject subPath, TransitType type) {
         List<AbstractWaypointDto> waypointDtoList = new ArrayList<>();

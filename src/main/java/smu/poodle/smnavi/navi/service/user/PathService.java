@@ -19,8 +19,6 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class PathService {
-
-    private final TransitRepository transitRepository;
     private final FullPathRepository fullPathRepository;
     private final PlaceRepository placeRepository;
 
@@ -40,12 +38,6 @@ public class PathService {
 
     public List<AbstractWaypointDto> getRouteList() {
         return placeRepository.findAllStartPlace().stream().map(Waypoint::toDto).toList();
-    }
-
-    public void updateRouteSeen(Long id) {
-        FullPath fullPath = transitRepository.findRouteById(id);
-
-        fullPath.updateIsSeen();
     }
 
     public List<GpsPointDto> get7016Route() {

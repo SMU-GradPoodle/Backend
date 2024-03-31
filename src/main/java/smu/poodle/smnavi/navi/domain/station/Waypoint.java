@@ -27,9 +27,6 @@ public abstract class Waypoint {
     String x;
     String y;
 
-    @OneToMany(mappedBy = "startWaypoint")
-    List<FullPath> fullPaths;
-
     public abstract String getPointName();
 
     public abstract AbstractWaypointDto toDto();

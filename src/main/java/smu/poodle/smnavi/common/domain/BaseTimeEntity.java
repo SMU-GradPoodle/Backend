@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 @Setter
 @Getter
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseTimeEntity {
 
     ZonedDateTime createdAt;

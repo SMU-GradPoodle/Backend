@@ -21,9 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('ADMIN')")
 public class AdminNaviController {
-    private final OdsayTransitRouteApi odsayTransitRouteApi;
     private final AdminNaviService adminNaviService;
-    private final PathService pathService;
 
     @PostMapping("/api/map/transit")
     public BaseResponse<Void> savePath(
@@ -32,14 +30,14 @@ public class AdminNaviController {
             @RequestParam String startY,
             @RequestParam List<Integer> indexes) {
 
-        odsayTransitRouteApi.callApiAndSavePathIfNotExist(startPlaceName, startX, startY, indexes);
+        adminNaviService.savePath(startPlaceName, startX, startY, indexes);
 
         return BaseResponse.ok();
     }
 
     @PostMapping("/api/route/seen/{id}")
     public BaseResponse<Void> getRouteList(@PathVariable Long id) {
-        pathService.updateRouteSeen(id);
+        adminNaviService.updateRouteSeen(id);
 
         return BaseResponse.created();
     }

@@ -21,19 +21,18 @@ public class SubPath {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    Integer sectionTime; //환승경로별 섹션 소요 시간
+    Integer sectionTime;
 
     @Enumerated(EnumType.STRING)
-    TransitType transitType; //교통 타입 (버스, 지하철, 도보)
+    TransitType transitType;
 
-    //todo: src, dst 매핑이 필요한가?
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "src_id")
-    Waypoint src; //서브경로 출발 지점
+    Waypoint src;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dst_id")
-    Waypoint dst; //서브경로 도착 지점
+    Waypoint dst;
 
     String fromName;
 
@@ -42,7 +41,7 @@ public class SubPath {
     @Enumerated(EnumType.STRING)
     BusType busType;
 
-    String lineName; //버스 번호 혹은 지하철 호선 이름
+    String lineName;
 
     @OneToMany(mappedBy = "subPath")
     List<SubPathAndEdge> edgeInfos;

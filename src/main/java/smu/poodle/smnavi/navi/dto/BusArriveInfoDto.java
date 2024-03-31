@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import smu.poodle.smnavi.navi.redisdomain.BusArriveInfo;
-import smu.poodle.smnavi.navi.domain.station.BusStationInfo;
+import smu.poodle.smnavi.navi.domain.BusStationInfo;
 
 
 @Getter
