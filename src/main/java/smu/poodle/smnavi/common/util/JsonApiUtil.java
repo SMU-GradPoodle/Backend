@@ -2,7 +2,7 @@ package smu.poodle.smnavi.common.util;
 
 import lombok.experimental.UtilityClass;
 import org.json.JSONObject;
-import smu.poodle.smnavi.common.errorcode.ErrorCode;
+import smu.poodle.smnavi.common.errorcode.StatusCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.map.callapi.ApiKeyValue;
 
@@ -13,7 +13,7 @@ import java.net.URL;
 
 @UtilityClass
 public class JsonApiUtil {
-    public static JSONObject urlBuildWithJson(final String hostUrl, ErrorCode errorCode, ApiKeyValue...params){
+    public static JSONObject urlBuildWithJson(final String hostUrl, StatusCode statusCode, ApiKeyValue...params){
         StringBuilder sb = new StringBuilder();
         sb.append(hostUrl).append("?");
 
@@ -34,7 +34,7 @@ public class JsonApiUtil {
             if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
                 rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             } else {
-                throw new RestApiException(errorCode);
+                throw new RestApiException(statusCode);
             }
             StringBuilder jsonBuilder = new StringBuilder();
             String line;
@@ -47,7 +47,7 @@ public class JsonApiUtil {
             return new JSONObject(jsonBuilder.toString());
         }
         catch (Exception e){
-            throw new RestApiException(errorCode);
+            throw new RestApiException(statusCode);
         }
     }
 }

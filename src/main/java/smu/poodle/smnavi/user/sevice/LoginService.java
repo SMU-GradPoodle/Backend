@@ -8,8 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.common.errorcode.CommonStatusCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.user.domain.UserEntity;
 import smu.poodle.smnavi.user.dto.AuthRequestDto;
@@ -23,6 +22,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import static smu.poodle.smnavi.user.exception.AuthExceptionCode.INVALID_MAIL_OR_PASSWORD;
 import static smu.poodle.smnavi.user.jwt.TokenType.ACCESS_TOKEN;
 import static smu.poodle.smnavi.user.jwt.TokenType.REFRESH_TOKEN;
 
@@ -39,10 +39,10 @@ public class LoginService {
 
     public TokenResponseDto login(HttpServletResponse response, AuthRequestDto.Login authRequestDto) {
         UserEntity user = userRepository.findByEmail(authRequestDto.getEmail()).orElseThrow(() ->
-                new RestApiException(CommonErrorCode.INVALID_MAIL_OR_PASSWORD));
+                new RestApiException(INVALID_MAIL_OR_PASSWORD));
 
         if (!passwordEncoder.matches(authRequestDto.getPassword(), user.getPassword())) {
-            throw new RestApiException(CommonErrorCode.INVALID_MAIL_OR_PASSWORD);
+            throw new RestApiException(INVALID_MAIL_OR_PASSWORD);
         }
 
         String accessToken = tokenProvider.createToken(ACCESS_TOKEN, user.getId(), user.getAuthority().name());

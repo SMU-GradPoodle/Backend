@@ -2,7 +2,7 @@ package smu.poodle.smnavi.tipoff.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.common.errorcode.CommonStatusCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.map.enums.TransitType;
 
@@ -41,7 +41,7 @@ public enum Location {
     public static Location stationIdToLocation(String stationId) {
         Location location = STATION_ID_MAP.get(stationId);
         if (location == null) {
-            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
+            throw new RestApiException(CommonStatusCode.INVALID_PARAMETER);
         }
         return location;
     }

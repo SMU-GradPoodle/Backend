@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import smu.poodle.smnavi.common.util.JsonApiUtil;
 import smu.poodle.smnavi.map.domain.path.DetailPosition;
 import smu.poodle.smnavi.map.domain.path.Edge;
-import smu.poodle.smnavi.common.errorcode.ExternApiErrorCode;
+import smu.poodle.smnavi.map.exception.ExternApiStatusCode;
 import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.repository.DetailPositionRepository;
 import smu.poodle.smnavi.map.repository.TransitRepository;
@@ -40,7 +40,7 @@ public class OdsayRouteDetailPositionApi {
         String HOST_URL = "https://api.odsay.com/v1/api/loadLane";
 
         JSONObject jsonObject = JsonApiUtil.urlBuildWithJson(HOST_URL,
-                ExternApiErrorCode.UNSUPPORTED_OR_INVALID_GPS_POINTS,
+                ExternApiStatusCode.UNSUPPORTED_OR_INVALID_GPS_POINTS,
                 new ApiKeyValue("apiKey", odsayApiKey),
                 new ApiKeyValue("mapObject", "0:0@" + mapObj));
 

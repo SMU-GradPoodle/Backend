@@ -1,15 +1,12 @@
 package smu.poodle.smnavi.tipoff.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import smu.poodle.smnavi.common.dto.PageResult;
-import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
-import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
+import smu.poodle.smnavi.common.errorcode.CommonStatusCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.map.enums.TransitType;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
@@ -21,9 +18,8 @@ import smu.poodle.smnavi.tipoff.dto.LikeInfoDto;
 import smu.poodle.smnavi.tipoff.dto.LocationDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffRequestDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffResponseDto;
+import smu.poodle.smnavi.tipoff.exception.TipOffExceptionCode;
 import smu.poodle.smnavi.tipoff.repository.TipOffRepository;
-import smu.poodle.smnavi.user.sevice.LoginService;
-import smu.poodle.smnavi.user.util.LoginUserUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +30,12 @@ import static smu.poodle.smnavi.user.util.LoginUserUtil.*;
 @Service
 @RequiredArgsConstructor
 public class TipOffService {
-    private final LoginService loginService;
     private final TipOffRepository tipOffRepository;
     private final BusStationRepository busStationRepository;
     private final SubwayStationRepository subwayStationRepository;
     private final ThumbService thumbService;
 
     @Transactional
-    @Validated
     public TipOffResponseDto.Simple registerTipOff(TipOffRequestDto tipOffRequestDto) {
         TipOff tipOff = tipOffRequestDto.ToEntity(getLoginMemberId());
 
@@ -58,7 +52,7 @@ public class TipOffService {
     @Transactional
     public TipOffResponseDto.Simple updateInfo(Long id, TipOffRequestDto tipOffRequestDto) {
         TipOff tipOff = tipOffRepository.findById(id)
-                .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(CommonStatusCode.RESOURCE_NOT_FOUND));
 
         authorizationTipOff(tipOff, tipOffRequestDto.getPassword());
 
@@ -70,7 +64,7 @@ public class TipOffService {
     @Transactional
     public void deleteTipOff(Long id, TipOffRequestDto tipOffRequestDto) {
         TipOff tipOff = tipOffRepository.findById(id).orElseThrow(() ->
-                new RestApiException(DetailErrorCode.NOT_CERTIFICATED)
+                new RestApiException(CommonStatusCode.FORBIDDEN)
         );
 
         authorizationTipOff(tipOff, tipOffRequestDto.getPassword());
@@ -78,7 +72,6 @@ public class TipOffService {
         tipOffRepository.delete(tipOff);
     }
 
-    //todo : 제목 검색이 의미가 있는가?
     public PageResult<TipOffResponseDto.Detail> getTipOffList(Boolean isMine, Pageable pageable) {
         Page<TipOff> tipOffPage = tipOffRepository.findByQuery(isMine, getLoginMemberId(), pageable);
 
@@ -89,7 +82,7 @@ public class TipOffService {
     @Transactional(readOnly = true)
     public TipOffResponseDto.Detail getTipOffById(Long id) {
         TipOff tipOff = tipOffRepository.findById(id).orElseThrow(() ->
-                new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
+                new RestApiException(CommonStatusCode.RESOURCE_NOT_FOUND));
         LikeInfoDto likeInfoDto = thumbService.getLikeInfo(tipOff.getId());
         return TipOffResponseDto.Detail.of(tipOff, likeInfoDto, getLoginMemberId());
     }
@@ -107,12 +100,12 @@ public class TipOffService {
     private void authorizationTipOff(TipOff tipOff, String password) {
         if (tipOff.getAuthor() == null) {
             if(!Objects.equals(password, tipOff.getPassword())) {
-                throw new RestApiException(DetailErrorCode.NOT_CORRECT_PASSWORD);
+                throw new RestApiException(TipOffExceptionCode.NOT_CORRECT_PASSWORD);
             }
         }
         else{
             if(!Objects.equals(tipOff.getAuthor().getId(), getLoginMemberId())) {
-                throw new RestApiException(CommonErrorCode.FORBIDDEN);
+                throw new RestApiException(CommonStatusCode.FORBIDDEN);
             }
         }
     }

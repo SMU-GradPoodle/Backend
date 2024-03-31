@@ -2,7 +2,7 @@ package smu.poodle.smnavi.tipoff.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.common.errorcode.CommonStatusCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 
 @Getter
@@ -23,6 +23,6 @@ public enum Kind { //사고 종류
             }
         }
         //todo: CustomException 만들기
-        throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
+        throw new RestApiException(CommonStatusCode.INVALID_PARAMETER);
     }
 }

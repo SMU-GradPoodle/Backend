@@ -18,9 +18,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
-import smu.poodle.smnavi.user.domain.UserEntity;
 
 import java.security.Key;
 import java.util.Collection;
@@ -28,7 +26,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 
-import static smu.poodle.smnavi.user.jwt.TokenType.*;
+import static smu.poodle.smnavi.user.exception.AuthExceptionCode.EXPIRED_TOKEN;
+import static smu.poodle.smnavi.user.exception.AuthExceptionCode.INVALID_TOKEN;
+import static smu.poodle.smnavi.user.exception.AuthExceptionCode.AUTHORIZATION_REQUIRED;
+import static smu.poodle.smnavi.user.exception.AuthExceptionCode.REFRESH_TOKEN_NOT_EXIST;
+import static smu.poodle.smnavi.user.jwt.TokenType.ACCESS_TOKEN;
+import static smu.poodle.smnavi.user.jwt.TokenType.REFRESH_TOKEN;
 
 
 @Component
@@ -72,7 +75,7 @@ public class TokenProvider {
         Claims claims = parseClaims(accessToken, accessTokenKey);
 
         if (ObjectUtils.isEmpty(claims.get(AUTHORITY_KEY))) {
-            throw new RestApiException(CommonErrorCode.INVALID_TOKEN);
+            throw new RestApiException(INVALID_TOKEN);
         }
 
         Collection<? extends GrantedAuthority> authority = Collections.singleton(new SimpleGrantedAuthority(claims.get(AUTHORITY_KEY).toString()));
@@ -97,19 +100,19 @@ public class TokenProvider {
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
-            throw new RestApiException(CommonErrorCode.EXPIRED_TOKEN);
+            throw new RestApiException(EXPIRED_TOKEN);
         } catch (Exception e) {
-            throw new RestApiException(CommonErrorCode.INVALID_TOKEN);
+            throw new RestApiException(INVALID_TOKEN);
         }
     }
 
     public String getAccessToken(HttpServletRequest request) {
         String token = Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION)).orElseThrow(() ->
-                new RestApiException(CommonErrorCode.LOGIN_REQUIRED)
+                new RestApiException(AUTHORIZATION_REQUIRED)
         );
 
         if (!StringUtils.hasText(token) || !StringUtils.startsWithIgnoreCase(token, TOKEN_TYPE)) {
-            throw new RestApiException(CommonErrorCode.INVALID_TOKEN);
+            throw new RestApiException(INVALID_TOKEN);
         }
 
         return token.substring(7);
@@ -117,11 +120,11 @@ public class TokenProvider {
 
     public String getRefreshToken(HttpServletRequest request) {
         String token = getCookieByName(request, REFRESH_TOKEN.getHeader()).orElseThrow(() ->
-                new RestApiException(CommonErrorCode.REFRESH_TOKEN_NOT_EXIST)
+                new RestApiException(REFRESH_TOKEN_NOT_EXIST)
         );
 
         if (!StringUtils.hasText(token) || !StringUtils.startsWithIgnoreCase(token, TOKEN_TYPE)) {
-            throw new RestApiException(CommonErrorCode.INVALID_TOKEN);
+            throw new RestApiException(INVALID_TOKEN);
         }
 
         return token.substring(7);

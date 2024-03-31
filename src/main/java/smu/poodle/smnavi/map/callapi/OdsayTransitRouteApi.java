@@ -5,7 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import smu.poodle.smnavi.common.errorcode.ExternApiErrorCode;
+import smu.poodle.smnavi.map.exception.ExternApiStatusCode;
 import smu.poodle.smnavi.common.util.JsonApiUtil;
 import smu.poodle.smnavi.map.enums.TransitType;
 import smu.poodle.smnavi.map.dto.BusStationDto;
@@ -40,7 +40,7 @@ public class OdsayTransitRouteApi {
         String HOST_URL = "https://api.odsay.com/v1/api/searchPubTransPathT";
 
         JSONObject transitJson = JsonApiUtil.urlBuildWithJson(HOST_URL,
-                ExternApiErrorCode.UNSUPPORTED_OR_INVALID_GPS_POINTS,
+                ExternApiStatusCode.UNSUPPORTED_OR_INVALID_GPS_POINTS,
                 new ApiKeyValue("apiKey", ODSAY_API_KEY),
                 new ApiKeyValue("SX", startX),
                 new ApiKeyValue("SY", startY),

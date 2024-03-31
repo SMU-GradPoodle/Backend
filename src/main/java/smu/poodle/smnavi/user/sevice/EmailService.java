@@ -7,12 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
-import java.util.Random;
+
+import static smu.poodle.smnavi.user.exception.AuthExceptionCode.*;
 
 @RequiredArgsConstructor
 @Service
@@ -59,7 +59,7 @@ public class EmailService {
 
             mimeMessage.setText(msg, "utf-8", "html");
         } catch (MessagingException e) {
-            throw new RestApiException(DetailErrorCode.FAIL_TO_SEND_MAIL);
+            throw new RestApiException(FAIL_TO_SEND_MAIL);
         }
         return mimeMessage;
     }
@@ -71,7 +71,7 @@ public class EmailService {
 
             javaMailSender.send(mimeMessage);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            throw new RestApiException(DetailErrorCode.FAIL_TO_SEND_MAIL);
+            throw new RestApiException(FAIL_TO_SEND_MAIL);
         }
     }
 }

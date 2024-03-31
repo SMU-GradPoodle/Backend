@@ -5,13 +5,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import smu.poodle.smnavi.common.dto.BaseResponse;
 import smu.poodle.smnavi.common.dto.PageResult;
+import smu.poodle.smnavi.tipoff.dto.LocationDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffRequestDto;
 import smu.poodle.smnavi.tipoff.dto.TipOffResponseDto;
 import smu.poodle.smnavi.tipoff.service.TipOffService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,11 +59,10 @@ public class TipOffController {
     /**
      * 제보 글 버튼 조회 API
      */
-    //todo : BaseResponse 로 리팩토링
     @GetMapping("/api/info/button")
-    public ResponseEntity<?> getTipOffButton() {
+    public BaseResponse<List<LocationDto>> getTipOffButton() {
 
-        return ResponseEntity.ok().body(tipOffService.getTipOffButton());
+        return BaseResponse.ok(tipOffService.getTipOffButton());
     }
 
     /**

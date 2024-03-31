@@ -12,8 +12,5 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity,String> {
     Optional<UserEntity> findByEmail(String email);
 
-    @Query("select u from UserEntity as u where u.jwtRefreshToken.refreshToken = :refreshToken")
-    Optional<UserEntity> findByRefreshToken(@Param("refreshToken") String refreshToken);
-
     Optional<UserEntity> findByNickname(String nickname);
 }

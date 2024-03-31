@@ -3,9 +3,6 @@ package smu.poodle.smnavi.tipoff.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import smu.poodle.smnavi.common.errorcode.CommonErrorCode;
-import smu.poodle.smnavi.common.errorcode.DetailErrorCode;
-import smu.poodle.smnavi.common.errorcode.ErrorCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.tipoff.domain.Thumb;
 import smu.poodle.smnavi.tipoff.domain.ThumbStatus;
@@ -13,11 +10,10 @@ import smu.poodle.smnavi.tipoff.domain.TipOff;
 import smu.poodle.smnavi.tipoff.dto.LikeInfoDto;
 import smu.poodle.smnavi.tipoff.repository.ThumbsRepository;
 import smu.poodle.smnavi.user.domain.UserEntity;
-import smu.poodle.smnavi.user.sevice.LoginService;
-import smu.poodle.smnavi.user.util.LoginUserUtil;
 
 import java.util.Optional;
 
+import static smu.poodle.smnavi.user.exception.AuthExceptionCode.AUTHORIZATION_REQUIRED;
 import static smu.poodle.smnavi.user.util.LoginUserUtil.*;
 
 @Service
@@ -30,7 +26,7 @@ public class ThumbService {
         Long userId = getLoginMemberId();
 
         if(userId == 0) {
-            throw new RestApiException(CommonErrorCode.LOGIN_REQUIRED);
+            throw new RestApiException(AUTHORIZATION_REQUIRED);
         }
 
         thumbsRepository.findByUserIdAndTipOffId(userId, tipOffId)
