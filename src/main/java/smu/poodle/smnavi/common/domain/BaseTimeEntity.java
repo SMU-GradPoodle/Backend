@@ -40,10 +40,6 @@ public abstract class BaseTimeEntity {
         return createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
-    public String getCreatedTimeToString() {
-        return createdAt.format(DateTimeFormatter.ofPattern("HH:mm"));
-    }
-
     public String getFormattedCreatedAt() {
         ZonedDateTime now = getCurrentSeoulTime();
         Duration duration = Duration.between(createdAt, now);

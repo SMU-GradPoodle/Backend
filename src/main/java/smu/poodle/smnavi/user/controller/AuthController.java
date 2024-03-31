@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import smu.poodle.smnavi.common.dto.BaseResponse;
+import smu.poodle.smnavi.common.response.BaseResponse;
 import smu.poodle.smnavi.user.dto.AuthRequestDto;
 import smu.poodle.smnavi.user.dto.TokenResponseDto;
 import smu.poodle.smnavi.user.sevice.TokenService;

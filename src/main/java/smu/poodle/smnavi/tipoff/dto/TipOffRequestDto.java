@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 import smu.poodle.smnavi.common.exception.RestApiException;
 import smu.poodle.smnavi.tipoff.domain.Location;
 import smu.poodle.smnavi.tipoff.domain.TipOff;
-import smu.poodle.smnavi.map.enums.TransitType;
+import smu.poodle.smnavi.navi.enums.TransitType;
 import smu.poodle.smnavi.tipoff.domain.Kind;
 import smu.poodle.smnavi.tipoff.exception.TipOffExceptionCode;
 import smu.poodle.smnavi.user.domain.UserEntity;

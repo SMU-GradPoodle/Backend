@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import smu.poodle.smnavi.common.dto.BaseResponse;
+import smu.poodle.smnavi.common.response.BaseResponse;
 import smu.poodle.smnavi.common.errorcode.CommonStatusCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
 
@@ -21,6 +21,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         BaseResponse<Void> baseResponse = BaseResponse.fail(new RestApiException(CommonStatusCode.UNAUTHORIZED));
 
+        response.setStatus(baseResponse.getStatusCode().status().value());
         response.setContentType("application/json;charset=UTF-8");
         String result = mapper.writeValueAsString(baseResponse);
         response.getWriter().write(result);
