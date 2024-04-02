@@ -11,8 +11,8 @@ import smu.poodle.smnavi.user.redisdomain.MailVerificationCache;
 import smu.poodle.smnavi.user.redisrepository.MailVerificationCacheRepository;
 import smu.poodle.smnavi.user.repository.UserRepository;
 
-import static smu.poodle.smnavi.user.exception.AuthExceptionCode.DUPLICATE_NICKNAME;
-import static smu.poodle.smnavi.user.exception.AuthExceptionCode.DUPLICATION_MAIL;
+import static smu.poodle.smnavi.user.exception.AuthExceptionCode.DUPLICATED_NICKNAME;
+import static smu.poodle.smnavi.user.exception.AuthExceptionCode.DUPLICATED_MAIL;
 import static smu.poodle.smnavi.user.exception.AuthExceptionCode.INVALID_VERIFICATION_KEY;
 import static smu.poodle.smnavi.user.exception.AuthExceptionCode.NOT_VERIFIED_MAIL;
 
@@ -30,7 +30,7 @@ public class SignupService {
 
     public void checkDuplicateNickname(AuthRequestDto.Nickname authRequestDto) {
         userRepository.findByNickname(authRequestDto.getNickname()).ifPresent((user) -> {
-            throw new RestApiException(DUPLICATE_NICKNAME);
+            throw new RestApiException(DUPLICATED_NICKNAME);
         });
     }
 
@@ -49,9 +49,9 @@ public class SignupService {
         userRepository.save(user);
     }
 
-    public void sendVerificationMail(AuthRequestDto.Certification authRequestDto) {
+    public void sendVerificationMail(AuthRequestDto.VerificationMail authRequestDto) {
         userRepository.findByEmail(authRequestDto.getEmail()).ifPresent((user) -> {
-            throw new RestApiException(DUPLICATION_MAIL);
+            throw new RestApiException(DUPLICATED_MAIL);
         });
         String certificationKey = emailService.sendCertificationKey(authRequestDto.getEmail());
         mailVerificationCacheRepository.save(MailVerificationCache.builder()
@@ -63,14 +63,14 @@ public class SignupService {
     }
 
 
-    public void authenticateMail(AuthRequestDto.Certification authRequestDto) {
+    public void verifyMail(AuthRequestDto.VerificationMail authRequestDto) {
         MailVerificationCache mailVerificationCache = mailVerificationCacheRepository.findById(authRequestDto.getEmail())
                 .orElseThrow(() -> new RestApiException(INVALID_VERIFICATION_KEY));
 
-        if (mailVerificationCache.getVerificationKey().equals(authRequestDto.getCertificationKey())) {
+        if (mailVerificationCache.getVerificationKey().equals(authRequestDto.getVerificationKey())) {
             mailVerificationCacheRepository.save(MailVerificationCache.builder()
                     .email(authRequestDto.getEmail())
-                    .verificationKey(authRequestDto.getCertificationKey())
+                    .verificationKey(authRequestDto.getVerificationKey())
                     .isVerify(true)
                     .expiration(CERTIFICATION_KEY_EXPIRE_SECONDS)
                     .build());

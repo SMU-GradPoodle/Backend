@@ -27,28 +27,27 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/check-duplicate-nickname")
-    public BaseResponse<Void> checkDuplicateNickname(@RequestBody @Valid AuthRequestDto.Nickname authRequestDto) {
+    public BaseResponse<Void> checkDuplicateNickname(@RequestBody AuthRequestDto.Nickname authRequestDto) {
         signupService.checkDuplicateNickname(authRequestDto);
 
         return BaseResponse.ok();
     }
 
     @PostMapping("/send-verification-mail")
-    public BaseResponse<Void> sendVerificationMail(@RequestBody @Valid AuthRequestDto.Certification authRequestDto) {
+    public BaseResponse<Void> sendVerificationMail(@RequestBody @Valid AuthRequestDto.VerificationMail authRequestDto) {
         signupService.sendVerificationMail(authRequestDto);
 
         return BaseResponse.ok();
     }
 
     @PostMapping("/verification-mail")
-    public BaseResponse<Void> verifyMail(@RequestBody @Valid AuthRequestDto.Certification authRequestDto) {
-        signupService.authenticateMail(authRequestDto);
+    public BaseResponse<Void> verifyMail(@RequestBody @Valid AuthRequestDto.VerificationMail authRequestDto) {
+        signupService.verifyMail(authRequestDto);
 
         return BaseResponse.ok();
     }
 
     @PostMapping("/signup")
-    @PreAuthorize("permitAll()")
     public BaseResponse<Void> signup(@RequestBody AuthRequestDto.SignUp authRequestDto){
         signupService.signup(authRequestDto);
         return BaseResponse.ok();

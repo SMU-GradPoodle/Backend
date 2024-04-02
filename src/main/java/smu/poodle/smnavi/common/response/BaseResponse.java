@@ -7,8 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.validation.BindingResult;
 import smu.poodle.smnavi.common.errorcode.StatusCode;
 import smu.poodle.smnavi.common.exception.RestApiException;
+
+import java.util.List;
 
 import static smu.poodle.smnavi.common.errorcode.CommonStatusCode.CREATED;
 import static smu.poodle.smnavi.common.errorcode.CommonStatusCode.OK;
@@ -25,6 +28,9 @@ public class BaseResponse<T> {
     String code;
     String message;
     T data;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<ValidationErrorDetail> validationExceptionDetails;
 
     public static BaseResponse<Void> ok() {
         return BaseResponse.<Void>builder()
@@ -57,6 +63,18 @@ public class BaseResponse<T> {
                 .statusCode(restApiException.getStatusCode())
                 .build();
     }
+
+    public static BaseResponse<Void> fail(final StatusCode statusCode, final BindingResult bindingResult) {
+        return BaseResponse.fail(statusCode, ValidationErrorDetail.of(bindingResult));
+    }
+
+    public static BaseResponse<Void> fail(final StatusCode statusCode, final List<ValidationErrorDetail> validationExceptionDetails) {
+        return BaseResponse.<Void>builder()
+                .statusCode(statusCode)
+                .validationExceptionDetails(validationExceptionDetails)
+                .build();
+    }
+
 
 
     private static <T> CustomBaseResponseBuilder<T> builder() {

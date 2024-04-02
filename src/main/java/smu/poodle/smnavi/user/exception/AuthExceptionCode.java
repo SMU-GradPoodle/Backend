@@ -15,15 +15,10 @@ public enum AuthExceptionCode implements StatusCode {
 
     EXPIRED_TOKEN(HttpStatus.FORBIDDEN, "A403-1", "토큰의 유효 시간이 만료 되었습니다."),
 
-    DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "A409-1", "이미 존재하는 닉네임입니다."),
-    DUPLICATE_EMAIL(HttpStatus.CONFLICT, "A409-2", "이미 가입 된 이메일입니다."),
+    DUPLICATED_NICKNAME(HttpStatus.CONFLICT, "A409-1", "이미 존재하는 닉네임입니다."),
+    DUPLICATED_MAIL(HttpStatus.CONFLICT, "T409-1", "이미 동일 메일로 가입된 계정이 있습니다."),
 
     FAIL_TO_SEND_MAIL(HttpStatus.INTERNAL_SERVER_ERROR, "A500-1", "메일 전송에 실패하였습니다."),
-
-    PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "T400-1", "익명 사용자는 비밀번호를 입력해야 합니다."),
-    DUPLICATION_MAIL(HttpStatus.CONFLICT, "T409-1", "이미 동일 메일로 가입된 계정이 있습니다."),
-    NOT_MODIFY_ERROR(HttpStatus.CONFLICT, "T409-2", "수정된 내용이 없습니다."),
-    NOT_CORRECT_PASSWORD(HttpStatus.CONFLICT, "T409-3", "비밀번호가 다릅니다."),
     ;
 
     private final HttpStatus status;

@@ -2,45 +2,61 @@ package smu.poodle.smnavi.user.dto;
 
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import smu.poodle.smnavi.user.domain.Authority;
 import smu.poodle.smnavi.user.domain.UserEntity;
 
 public class AuthRequestDto {
+    private static final String SMU_MAIL_PATTERN =  "^[a-zA-Z0-9]+@sangmyung\\.kr";
+    private static final String SMU_MAIL_MESSAGE =  "상명대 메일만 사용 가능합니다.";
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Nickname {
-        String nickname;
+        public String nickname;
     }
 
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     @FieldDefaults(level = AccessLevel.PRIVATE)
-    public static class Certification {
-        @Pattern(regexp = "^[a-zA-Z0-9]+@sangmyung\\.kr",
-                message = "상명대 메일만 사용 가능합니다.")
+    public static class VerificationMail {
+        @Pattern(regexp = SMU_MAIL_PATTERN,
+                message = SMU_MAIL_MESSAGE)
         String email;
-        String certificationKey;
-
+        String verificationKey;
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Login {
-        @Pattern(regexp = "^[a-zA-Z0-9]+@sangmyung\\.kr",
-                message = "상명대 메일만 사용 가능합니다.")
+        @Pattern(regexp = SMU_MAIL_PATTERN,
+                message = SMU_MAIL_MESSAGE)
         String email;
         String password;
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class SignUp {
-        @Pattern(regexp = "^[a-zA-Z0-9]+@sangmyung\\.kr",
-                message = "상명대 메일만 사용 가능합니다.")
+        @Pattern(regexp = SMU_MAIL_PATTERN,
+                message = SMU_MAIL_MESSAGE)
         String email;
         String password;
         String nickname;

@@ -9,6 +9,8 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +37,8 @@ import static smu.poodle.smnavi.user.jwt.TokenType.REFRESH_TOKEN;
 
 
 @Component
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenProvider {
     private static final String TOKEN_TYPE = "Bearer";
     private static final String AUTHORITY_KEY = "auth";
@@ -43,6 +47,7 @@ public class TokenProvider {
 
     @Value("${JWT_REFRESH_TOKEN_SECRET_KEY}")
     private String refreshTokenSecretKey;
+
     private Key accessTokenKey;
     private Key refershTokenKey;
 
